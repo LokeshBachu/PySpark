@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PySpark Complete Guide — pyspark.in Curriculum</title>
+  <style>
+    :root {
+      --bg:#0d0f18; --surface:#13151f; --surface2:#1c1f30; --border:#252840;
+      --accent:#7c6af7; --teal:#50cfb2; --orange:#f7a256; --red:#f76c6c;
+      --yellow:#ffd166; --text:#dde1f5; --muted:#6e748f;
+      --code-bg:#0a0c14;
+      --kw:#c792ea; --st:#c3e88d; --nu:#f78c6c; --cm:#4a5568;
+      --fn:#82aaff; --cl:#ffcb6b; --bi:#50cfb2; --op:#89ddff;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.75}
+    .layout{display:flex;min-height:100vh}
+
+    /* ── Sidebar ── */
+    nav{width:270px;min-width:270px;background:var(--surface);border-right:1px solid var(--border);
+      position:sticky;top:0;height:100vh;overflow-y:auto;padding:0 0 32px}
+    nav::-webkit-scrollbar{width:4px}
+    nav::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .nav-top{padding:20px 20px 16px;border-bottom:1px solid var(--border);margin-bottom:8px}
+    .nav-top h1{font-size:1rem;color:var(--accent);letter-spacing:.03em}
+    .nav-top p{font-size:.72rem;color:var(--muted);margin-top:2px}
+    .progress-bar{height:2px;background:var(--accent);width:0;transition:width .25s}
+    .nav-group{padding:8px 20px 2px;font-size:.62rem;text-transform:uppercase;
+      letter-spacing:.14em;color:var(--muted);margin-top:6px}
+    nav a{display:block;padding:5px 20px;color:var(--muted);text-decoration:none;
+      font-size:.8rem;border-left:2px solid transparent;transition:all .15s;line-height:1.5}
+    nav a:hover{color:var(--text);border-left-color:var(--accent);background:var(--surface2)}
+    nav a.active{color:var(--accent);border-left-color:var(--accent);background:var(--surface2)}
+
+    /* ── Main ── */
+    main{flex:1;max-width:980px;padding:48px 52px 120px;margin:0 auto}
+
+    /* ── Hero ── */
+    .hero{background:linear-gradient(135deg,#13151f 0%,#0d0f18 70%,#120d1e 100%);
+      border:1px solid var(--border);border-radius:14px;padding:38px 44px;margin-bottom:52px;position:relative;overflow:hidden}
+    .hero::after{content:'⚡';position:absolute;right:36px;top:16px;font-size:7rem;opacity:.05;pointer-events:none}
+    .hero h1{font-size:2.2rem;font-weight:800;color:#fff;margin-bottom:10px}
+    .hero p{color:var(--muted);font-size:1rem;max-width:620px}
+    .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+    .tag{padding:3px 11px;border-radius:20px;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+    .tag-p{background:rgba(124,106,247,.15);color:var(--accent);border:1px solid rgba(124,106,247,.3)}
+    .tag-t{background:rgba(80,207,178,.12);color:var(--teal);border:1px solid rgba(80,207,178,.25)}
+    .tag-o{background:rgba(247,162,86,.12);color:var(--orange);border:1px solid rgba(247,162,86,.25)}
+    .tag-r{background:rgba(247,108,108,.12);color:var(--red);border:1px solid rgba(247,108,108,.25)}
+
+    /* ── Typography ── */
+    h2{font-size:1.6rem;font-weight:700;color:#fff;margin:60px 0 16px;
+      padding-bottom:8px;border-bottom:1px solid var(--border)}
+    h3{font-size:1.05rem;font-weight:600;color:var(--teal);margin:28px 0 10px}
+    h4{font-size:.92rem;font-weight:600;color:var(--orange);margin:18px 0 8px}
+    p{margin-bottom:14px;color:var(--text)}
+    ul,ol{margin:8px 0 14px 22px}
+    li{margin-bottom:5px}
+    strong{color:#fff}
+    code{font-family:'Cascadia Code','Fira Code',Consolas,monospace;background:var(--code-bg);
+      color:var(--teal);padding:1px 6px;border-radius:4px;font-size:.86em}
+    section{scroll-margin-top:24px}
+    a{color:var(--accent)}
+
+    /* ── Code blocks ── */
+    .cb{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;margin:16px 0;overflow:hidden}
+    .cb-head{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;
+      background:var(--surface2);border-bottom:1px solid var(--border);font-size:.73rem}
+    .cb-head .lang{color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .cb-head .file{color:var(--muted)}
+    pre{padding:18px 22px;overflow-x:auto;font-family:'Cascadia Code','Fira Code',Consolas,monospace;font-size:.83rem;line-height:1.8}
+    pre::-webkit-scrollbar{height:4px}
+    pre::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .kw{color:var(--kw)} .st{color:var(--st)} .nu{color:var(--nu)} .cm{color:var(--cm);font-style:italic}
+    .fn{color:var(--fn)} .cl{color:var(--cl)} .bi{color:var(--bi)} .op{color:var(--op)}
+
+    /* ── Output ── */
+    .out{background:#08090f;border:1px solid var(--border);border-top:1px dashed var(--border);
+      border-radius:0 0 10px 10px;padding:12px 22px;font-family:'Cascadia Code',Consolas,monospace;
+      font-size:.8rem;color:#6ec98a;margin-top:-1px}
+    .out-lbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+
+    /* ── Callouts ── */
+    .note{border-left:3px solid;border-radius:0 8px 8px 0;padding:12px 16px;margin:16px 0;font-size:.88rem}
+    .note strong{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+    .note-info{background:rgba(80,207,178,.07);border-color:var(--teal)} .note-info strong{color:var(--teal)}
+    .note-warn{background:rgba(247,162,86,.07);border-color:var(--orange)} .note-warn strong{color:var(--orange)}
+    .note-tip{background:rgba(124,106,247,.07);border-color:var(--accent)} .note-tip strong{color:var(--accent)}
+    .note-danger{background:rgba(247,108,108,.07);border-color:var(--red)} .note-danger strong{color:var(--red)}
+
+    /* ── Tables ── */
+    .tw{overflow-x:auto;margin:16px 0}
+    table{width:100%;border-collapse:collapse;font-size:.86rem}
+    th{background:var(--surface2);color:var(--muted);font-weight:600;text-transform:uppercase;
+      font-size:.7rem;letter-spacing:.07em;padding:9px 13px;text-align:left;border-bottom:1px solid var(--border)}
+    td{padding:8px 13px;border-bottom:1px solid var(--border)}
+    tr:hover td{background:var(--surface2)}
+
+    /* ── Cards ── */
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;transition:border-color .2s}
+    .card:hover{border-color:var(--accent)}
+    .card h4{margin:0 0 6px;font-size:.9rem}
+    .card p{font-size:.82rem;color:var(--muted);margin:0}
+
+    /* ── Chapter divider ── */
+    .chapter{display:flex;align-items:center;gap:12px;margin:52px 0 4px}
+    .chapter-num{background:var(--accent);color:#fff;font-size:.7rem;font-weight:800;
+      padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+    .chapter-line{flex:1;height:1px;background:var(--border)}
+
+    @media(max-width:860px){nav{display:none}main{padding:24px 18px 64px}h2{font-size:1.3rem}}
+  </style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<nav>
+  <div class="progress-bar" id="prog"></div>
+  <div class="nav-top">
+    <h1>PySpark.in Guide</h1>
+    <p>Complete Curriculum Reference</p>
+  </div>
+
+  <div class="nav-group">Introduction</div>
+  <a href="#s-intro">What is PySpark</a>
+  <a href="#s-genesis">Genesis of Spark</a>
+  <a href="#s-revolution">Spark Revolution</a>
+  <a href="#s-hadooptopyspark">Hadoop to PySpark</a>
+  <a href="#s-session">SparkSession Config</a>
+
+  <div class="nav-group">Setup & Architecture</div>
+  <a href="#s-install">Installation &amp; Setup</a>
+  <a href="#s-arch">Runtime Architecture</a>
+  <a href="#s-execmodel">Architecture &amp; Execution Model</a>
+
+  <div class="nav-group">Core Data Structures</div>
+  <a href="#s-rdd">RDD Fundamentals</a>
+  <a href="#s-rdddeep">Understanding RDD</a>
+  <a href="#s-dfbasics">DataFrame Basics</a>
+  <a href="#s-dfcreation">DataFrame Creation</a>
+  <a href="#s-dfexplore">Exploring DataFrames</a>
+  <a href="#s-dfops">DataFrame Operations</a>
+
+  <div class="nav-group">SQL & Analytics</div>
+  <a href="#s-sql">PySpark SQL</a>
+  <a href="#s-joins">Joins</a>
+  <a href="#s-funcs">PySpark Functions</a>
+  <a href="#s-window">Window Functions</a>
+  <a href="#s-agg">Aggregation &amp; GroupBy</a>
+
+  <div class="nav-group">Data Quality</div>
+  <a href="#s-missing">Handling Missing Data</a>
+  <a href="#s-dates">Dates &amp; Timestamps</a>
+
+  <div class="nav-group">I/O Formats</div>
+  <a href="#s-io">JSON / CSV / Parquet</a>
+
+  <div class="nav-group">Advanced</div>
+  <a href="#s-perf">Performance Optimization</a>
+  <a href="#s-aws">PySpark with AWS</a>
+  <a href="#s-delta">Delta Lake</a>
+  <a href="#s-stream">Structured Streaming</a>
+  <a href="#s-mllib">MLlib</a>
+
+  <div class="nav-group">Reference</div>
+  <a href="#s-interview">Interview Questions</a>
+</nav>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<main>
+
+<div class="hero">
+  <h1>PySpark Complete Guide</h1>
+  <p>Full curriculum reference modelled on the <strong>pyspark.in</strong> learning path — from first principles to production-ready patterns.</p>
+  <div class="tags">
+    <span class="tag tag-p">Apache Spark 3.5</span>
+    <span class="tag tag-t">Python 3.9+</span>
+    <span class="tag tag-o">Delta Lake</span>
+    <span class="tag tag-r">Streaming</span>
+    <span class="tag tag-t">MLlib</span>
+    <span class="tag tag-p">AWS</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     CHAPTER 1 — INTRODUCTION
+════════════════════════════════════════════════ -->
+<div class="chapter"><span class="chapter-num">Chapter 1 · Introduction</span><div class="chapter-line"></div></div>
+
+<section id="s-intro">
+<h2>What is PySpark?</h2>
+
+<h3>1.1 The Big Picture</h3>
+<p>Imagine you have <strong>500 GB of user clickstream data</strong> but your laptop only has 16 GB of RAM. PySpark solves exactly this problem.</p>
+<p><strong>PySpark</strong> is the Python API for <strong>Apache Spark</strong> — a distributed computing engine that divides work across multiple machines in a cluster, each handling a portion of the data simultaneously.</p>
+
+<div class="note note-tip"><strong>Analogy</strong>
+Sorting 1 million books alone is slow. Hire 100 people, give each 10,000 books, sort in parallel, merge results = fast and scalable. That is distributed computing.</div>
+
+<h3>1.2 Pandas vs PySpark</h3>
+<div class="tw"><table>
+  <tr><th>Feature</th><th>Pandas</th><th>PySpark</th></tr>
+  <tr><td>Data Size</td><td>Up to ~10 GB (single machine)</td><td>Petabytes (cluster)</td></tr>
+  <tr><td>Processing</td><td>Eager (runs immediately)</td><td>Lazy (builds plan first)</td></tr>
+  <tr><td>Execution</td><td>Single machine</td><td>Distributed</td></tr>
+  <tr><td>Use Case</td><td>Data analysis, small ETL</td><td>Big data ETL, ML at scale</td></tr>
+  <tr><td>Learning Curve</td><td>Easier</td><td>Requires distributed concepts</td></tr>
+  <tr><td>Speed — small data</td><td>Faster (no overhead)</td><td>Slower (cluster overhead)</td></tr>
+  <tr><td>Speed — big data</td><td>Crashes / very slow</td><td>Scales linearly</td></tr>
+</table></div>
+
+<h3>1.3 Lazy Evaluation — The Key Concept</h3>
+<p>PySpark does <strong>not</strong> execute code line-by-line. It builds a <strong>DAG (Directed Acyclic Graph)</strong> and executes only when an action is called.</p>
+<div class="tw"><table>
+  <tr><th>Type</th><th>Behaviour</th><th>Examples</th></tr>
+  <tr><td><strong>Transformations</strong></td><td>Lazy — extend the plan, do NOT execute</td><td><code>filter()</code> <code>select()</code> <code>groupBy()</code> <code>join()</code> <code>withColumn()</code></td></tr>
+  <tr><td><strong>Actions</strong></td><td>Eager — execute the full plan and return results</td><td><code>show()</code> <code>count()</code> <code>collect()</code> <code>write()</code></td></tr>
+</table></div>
+
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">lazy_eval.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col
+
+spark = <span class="cl">SparkSession</span>.<span class="fn">builder</span>.<span class="fn">appName</span>(<span class="st">"Demo"</span>).<span class="fn">getOrCreate</span>()
+
+data = [(<span class="st">"Alice"</span>,<span class="nu">30</span>,<span class="st">"HR"</span>),(<span class="st">"Bob"</span>,<span class="nu">22</span>,<span class="st">"IT"</span>),(<span class="st">"Charlie"</span>,<span class="nu">28</span>,<span class="st">"IT"</span>),
+        (<span class="st">"David"</span>,<span class="nu">35</span>,<span class="st">"Finance"</span>),(<span class="st">"Eve"</span>,<span class="nu">24</span>,<span class="st">"HR"</span>),(<span class="st">"Frank"</span>,<span class="nu">40</span>,<span class="st">"Finance"</span>)]
+df = spark.<span class="fn">createDataFrame</span>(data, [<span class="st">"name"</span>,<span class="st">"age"</span>,<span class="st">"department"</span>])
+
+<span class="cm"># Transformations — nothing executes yet</span>
+filtered = df.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="st">"age"</span>) &gt; <span class="nu">25</span>)
+grouped  = filtered.<span class="fn">groupBy</span>(<span class="st">"department"</span>).<span class="fn">count</span>()
+
+<span class="cm"># Action — Spark executes the full plan NOW</span>
+grouped.<span class="fn">show</span>()</pre></div>
+<div class="out"><div class="out-lbl">Output</div>
++----------+-----+
+|department|count|
++----------+-----+
+|   Finance|    2|
+|        IT|    1|
+|        HR|    1|
++----------+-----+</div>
+
+<div class="note note-info"><strong>Catalyst Optimizer</strong>
+Lazy evaluation lets Spark's Catalyst Optimizer reorder operations, push filters down, and skip unneeded columns — before any computation starts.</div>
+</section>
+
+<section id="s-genesis">
+<h2>The Genesis of Spark</h2>
+
+<h3>The Big Data Challenge</h3>
+<p>Increased consumer traffic, a variety of new forms of data, and greater computational demands required more storage and better performance. Traditional data storage methods — including <strong>Relational Database Management Systems (RDBMSs)</strong> and imperative programming techniques — were unable to handle enormous amounts of data and their processing.</p>
+<p>The core problems that needed to be solved were:</p>
+<ul>
+  <li><strong>Data collection and ingestion</strong> — ingesting large volumes from diverse sources</li>
+  <li><strong>Data storage and management</strong> — storing petabytes reliably</li>
+  <li><strong>Data processing and transformation</strong> — running complex computations at scale</li>
+  <li><strong>Data access and retrieval</strong> — querying and serving results quickly</li>
+</ul>
+
+<h3>Google's White Papers</h3>
+<p>Google was the first to overcome these problems and published a series of influential white papers that laid the theoretical foundation for modern big-data systems:</p>
+<div class="tw"><table>
+  <tr><th>Year</th><th>Paper</th><th>Solves</th></tr>
+  <tr><td>2003</td><td>Google File System (GFS)</td><td>Distributed, fault-tolerant storage</td></tr>
+  <tr><td>2004</td><td>MapReduce</td><td>Parallel data processing at scale</td></tr>
+  <tr><td>2006</td><td>Bigtable</td><td>Structured storage over distributed file systems</td></tr>
+</table></div>
+<p>These white papers were highly appreciated by the open-source community and served as the inspiration for the design and development of a comparable open-source implementation — <strong>Hadoop</strong>.</p>
+
+<h3>Hadoop — The Open-Source Response</h3>
+<p>Hadoop is an open-source software framework for storing and processing large amounts of data in a distributed computing environment. Key characteristics:</p>
+<ul>
+  <li>Based on the <strong>MapReduce</strong> programming model, allowing parallel processing of large datasets</li>
+  <li>Framework written in <strong>Java</strong></li>
+  <li>Designed to start small and expand as you grow — from a few nodes to thousands</li>
+  <li>Allows storage capacity of hundreds to thousands of computers, used as a <strong>unified storage system</strong> (HDFS)</li>
+  <li>Fault-tolerant by design — data is replicated across nodes</li>
+</ul>
+
+<h3>Hive — SQL on Hadoop</h3>
+<p>Many solutions were built on top of Hadoop. The most widely adopted was <strong>Apache Hive</strong>, which offered SQL-like capabilities on Hadoop data:</p>
+<ul>
+  <li>Create Databases, Tables, and Views</li>
+  <li>Run SQL Queries over HDFS data</li>
+</ul>
+<p>Together, <strong>Hadoop + Hive</strong> became very popular. But significant problems remained:</p>
+<div class="tw"><table>
+  <tr><th>Problem</th><th>Detail</th></tr>
+  <tr><td>Performance</td><td>Hive SQL queries were much slower than RDBMS SQL — every job wrote to disk</td></tr>
+  <tr><td>Ease of development</td><td>Writing MapReduce programs was difficult and verbose</td></tr>
+  <tr><td>Language support</td><td>MapReduce was originally Java-only</td></tr>
+  <tr><td>Storage cost</td><td>HDFS on-premise storage was expensive compared to cloud storage</td></tr>
+  <tr><td>Resource management</td><td>Only YARN container support — no Mesos, Docker, or Kubernetes</td></tr>
+</table></div>
+<p>Hadoop left a lot of scope for improvement — and as a result, <strong>Apache Spark</strong> came into existence.</p>
+
+<h3>Hadoop vs Spark — Head to Head</h3>
+<div class="tw"><table>
+  <tr><th>Aspect</th><th>Hadoop MapReduce</th><th>Apache Spark</th></tr>
+  <tr><td>Storage model</td><td>Disk after every stage</td><td>In-memory (RAM)</td></tr>
+  <tr><td>Speed</td><td>Baseline</td><td>Up to 100× faster (iterative)</td></tr>
+  <tr><td>API</td><td>Java only (originally)</td><td>Python, Scala, Java, R, SQL</td></tr>
+  <tr><td>Streaming</td><td>Batch only</td><td>Batch + real-time streaming</td></tr>
+  <tr><td>ML support</td><td>Mahout (limited)</td><td>MLlib built-in</td></tr>
+  <tr><td>Graph processing</td><td>External tools</td><td>GraphX built-in</td></tr>
+</table></div>
+
+<h3>Spark Timeline</h3>
+<ul>
+  <li><strong>2009</strong> — Created at UC Berkeley AMPLab</li>
+  <li><strong>2010</strong> — Open-sourced under BSD</li>
+  <li><strong>2013</strong> — Donated to Apache Software Foundation</li>
+  <li><strong>2014</strong> — Apache Spark 1.0 released; PySpark introduced</li>
+  <li><strong>2016</strong> — Spark 2.0: SparkSession unifies APIs, Structured Streaming</li>
+  <li><strong>2020</strong> — Spark 3.0: Adaptive Query Execution (AQE), pandas API</li>
+  <li><strong>2023+</strong> — Spark 3.4 / 3.5: ANSI SQL, Spark Connect, improved Python UDFs</li>
+</ul>
+</section>
+
+<section id="s-session">
+<h2>SparkSession Configuration</h2>
+<h3>What is SparkSession?</h3>
+<p><code>SparkSession</code> is the unified entry point for all Spark functionality since Spark 2.0. It replaces the older <code>SparkContext</code>, <code>SQLContext</code>, and <code>HiveContext</code>.</p>
+
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">spark_session.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+
+<span class="cm"># ── Minimal local session ──────────────────────────────────</span>
+spark = (
+    <span class="cl">SparkSession</span>.<span class="fn">builder</span>
+    .<span class="fn">appName</span>(<span class="st">"MyApp"</span>)
+    .<span class="fn">master</span>(<span class="st">"local[*]"</span>)   <span class="cm"># use all CPU cores locally</span>
+    .<span class="fn">getOrCreate</span>()
+)
+
+<span class="cm"># ── Production session ─────────────────────────────────────</span>
+spark = (
+    <span class="cl">SparkSession</span>.<span class="fn">builder</span>
+    .<span class="fn">appName</span>(<span class="st">"ProductionETL"</span>)
+    .<span class="fn">config</span>(<span class="st">"spark.executor.memory"</span>,              <span class="st">"4g"</span>)
+    .<span class="fn">config</span>(<span class="st">"spark.executor.cores"</span>,               <span class="st">"4"</span>)
+    .<span class="fn">config</span>(<span class="st">"spark.driver.memory"</span>,                <span class="st">"2g"</span>)
+    .<span class="fn">config</span>(<span class="st">"spark.sql.shuffle.partitions"</span>,       <span class="st">"200"</span>)
+    .<span class="fn">config</span>(<span class="st">"spark.sql.adaptive.enabled"</span>,         <span class="st">"true"</span>)
+    .<span class="fn">config</span>(<span class="st">"spark.serializer"</span>,
+            <span class="st">"org.apache.spark.serializer.KryoSerializer"</span>)
+    .<span class="fn">getOrCreate</span>()
+)
+
+<span class="cm"># Access underlying SparkContext</span>
+sc = spark.sparkContext
+sc.<span class="fn">setLogLevel</span>(<span class="st">"WARN"</span>)
+
+<span class="cm"># Read/set configs at runtime</span>
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="st">"spark.sql.shuffle.partitions"</span>, <span class="st">"50"</span>)
+<span class="bi">print</span>(spark.<span class="fn">conf</span>.<span class="fn">get</span>(<span class="st">"spark.sql.shuffle.partitions"</span>))
+
+<span class="cm"># Always stop when done</span>
+spark.<span class="fn">stop</span>()</pre></div>
+
+<h3>Key Configuration Parameters</h3>
+<div class="tw"><table>
+  <tr><th>Config Key</th><th>Default</th><th>Description</th></tr>
+  <tr><td><code>spark.app.name</code></td><td>—</td><td>Application name shown in Spark UI</td></tr>
+  <tr><td><code>spark.master</code></td><td>—</td><td><code>local[N]</code>, <code>yarn</code>, <code>spark://host:7077</code>, <code>k8s://...</code></td></tr>
+  <tr><td><code>spark.executor.memory</code></td><td>1g</td><td>RAM per executor</td></tr>
+  <tr><td><code>spark.executor.cores</code></td><td>1</td><td>CPU cores per executor</td></tr>
+  <tr><td><code>spark.driver.memory</code></td><td>1g</td><td>RAM for the driver process</td></tr>
+  <tr><td><code>spark.sql.shuffle.partitions</code></td><td>200</td><td>Partitions after a shuffle (groupBy/join)</td></tr>
+  <tr><td><code>spark.sql.adaptive.enabled</code></td><td>true (3.2+)</td><td>Adaptive Query Execution on/off</td></tr>
+  <tr><td><code>spark.serializer</code></td><td>JavaSerializer</td><td>Use KryoSerializer for speed</td></tr>
+  <tr><td><code>spark.default.parallelism</code></td><td>cores×2</td><td>Default RDD partition count</td></tr>
+</table></div>
+</section>
+
+<section id="s-revolution">
+<h2>Spark Revolution</h2>
+
+<h3>Understanding the Data Lake Landscape</h3>
+<p>Before HDFS &amp; MapReduce, organisations stored data in <strong>Data Warehouses</strong> (e.g. Teradata, Exadata), pulling data in from many OLTP/OLAP systems. These warehouses faced serious limitations:</p>
+<div class="tw"><table>
+  <tr><th>Challenge</th><th>Detail</th></tr>
+  <tr><td>Vertical scaling</td><td>Adding more DW capacity was expensive</td></tr>
+  <tr><td>Capital investment</td><td>Large upfront hardware costs</td></tr>
+  <tr><td>Storage</td><td>Non-scalable; capacity hard to extend</td></tr>
+  <tr><td>Data types</td><td>Supports structured data only</td></tr>
+</table></div>
+
+<p>To overcome these, the <strong>Data Lake</strong> concept emerged with:</p>
+<ul>
+  <li><strong>Horizontal scaling</strong> — add cheap commodity servers to clusters</li>
+  <li><strong>Low capital investment</strong> — commodity hardware &amp; cloud storage</li>
+  <li><strong>Scalable storage</strong> — cloud-based, grows on demand</li>
+  <li><strong>Any data type</strong> — structured, semi-structured, and unstructured</li>
+</ul>
+
+<h3>Data Lake Architecture — 4 Core Capabilities</h3>
+<p>While storage was the original core capability, modern Data Lakes evolved 4 important capabilities:</p>
+<div class="tw"><table>
+  <tr><th>Capability</th><th>Description</th></tr>
+  <tr><td>Ingest</td><td>Data collection and ingestion from diverse sources</td></tr>
+  <tr><td>Storage</td><td>Distributed, fault-tolerant, scalable storage (HDFS, S3, ADLS)</td></tr>
+  <tr><td>Process</td><td>Data processing and transformation (where Spark shines)</td></tr>
+  <tr><td>Consume</td><td>Data access and retrieval for analytics, ML, BI tools</td></tr>
+</table></div>
+
+<h3>Apache Spark &amp; its Ecosystem</h3>
+<ul>
+  <li>A <strong>unified analytics engine</strong> for large-scale distributed data processing and machine learning</li>
+  <li>Open-source cluster computing framework handling both <strong>batch</strong> and <strong>streaming</strong> data</li>
+  <li>Built on top of Hadoop MapReduce concepts but stores intermediate data <strong>in-memory</strong> — making it far faster</li>
+  <li>Initiated by <strong>Matei Zaharia</strong> at UC Berkeley's AMP Lab in 2009; open-sourced 2010 (BSD); Apache Top-Level Project in 2014</li>
+</ul>
+
+<h3>Spark Ecosystem — 3 Tiers</h3>
+<p>The Apache Spark ecosystem is divided into three distinct tiers:</p>
+
+<h4>Tier 1 — Storage &amp; Cluster Manager</h4>
+<p>Spark is a distributed <em>processing</em> engine; it deliberately does <strong>not</strong> bundle its own cluster resource manager or distributed storage. This decoupling lets you plug in the combination that suits your environment:</p>
+<div class="tw"><table>
+  <tr><th>Role</th><th>Options</th></tr>
+  <tr><td>Cluster Manager</td><td>Apache YARN, Apache Mesos, Kubernetes, Spark Standalone</td></tr>
+  <tr><td>Storage</td><td>HDFS, Amazon S3, Azure Data Lake, Google Cloud Storage, Cassandra FS, and more</td></tr>
+</table></div>
+
+<h4>Tier 2 — Spark Core</h4>
+<p>The heart of Spark, containing two main components:</p>
+<ul>
+  <li><strong>Spark Compute Engine</strong> — handles memory management, job scheduling, fault recovery, and communication with the cluster manager &amp; storage system. Submit your job; the compute engine does the rest.</li>
+  <li><strong>Spark Core APIs</strong>:
+    <ul>
+      <li><em>Structured APIs</em> — DataFrames &amp; Datasets, designed and optimised for structured data</li>
+      <li><em>Unstructured APIs</em> — lower-level RDDs, Accumulators, and Broadcast variables; available in Scala, Python, Java, and R</li>
+    </ul>
+  </li>
+</ul>
+
+<h4>Tier 3 — Set of Libraries</h4>
+<p>High-level libraries built on Spark Core APIs that provide specialised functionality:</p>
+<div class="tw"><table>
+  <tr><th>Library</th><th>Purpose</th></tr>
+  <tr><td><strong>Spark SQL</strong></td><td>SQL queries &amp; structured data processing</td></tr>
+  <tr><td><strong>Spark Streaming</strong></td><td>Consume and process continuous data streams</td></tr>
+  <tr><td><strong>MLlib</strong></td><td>Machine learning library with high-quality algorithms</td></tr>
+  <tr><td><strong>GraphX</strong></td><td>Graph computation with a library of common graph algorithms</td></tr>
+</table></div>
+<p>These libraries provide APIs, DSLs, and algorithms in multiple languages, and directly depend on Spark Core APIs to achieve distributed processing.</p>
+</section>
+
+<section id="s-hadooptopyspark">
+<h2>Hadoop to PySpark</h2>
+
+<h3>Why PySpark?</h3>
+<p>In the early days, tools like <strong>Hadoop MapReduce</strong> were widely used to process large datasets. However, they were slow because data had to be repeatedly read from and written to disk at every stage.</p>
+<p><strong>PySpark</strong> (Apache Spark + Python) changed this. By storing most data <strong>in memory (RAM)</strong> instead of on disk, PySpark can run computations <strong>10–100× faster</strong>.</p>
+
+<h3>What Is PySpark Used For?</h3>
+<p>PySpark is a distributed data processing framework. It allows you to:</p>
+<ul>
+  <li>Analyze very large datasets quickly that don't fit in a single machine's memory</li>
+  <li>Use Python-like syntax, making it accessible for developers and data scientists</li>
+  <li>Distribute work across multiple computers (nodes) instead of overloading a single machine</li>
+</ul>
+<p><strong>Think of it like teamwork:</strong></p>
+<ul>
+  <li><em>Normal Python</em>: One person does the entire job</li>
+  <li><em>PySpark</em>: A team works together, each handling part of the task, then combining results</li>
+</ul>
+
+<h3>Example: Average Age Calculation</h3>
+<p>Imagine you have a huge file of client records and you need the average age:</p>
+<div class="tw"><table>
+  <tr><th></th><th>Without PySpark (Python only)</th><th>With PySpark</th></tr>
+  <tr><td>Input File</td><td>May not fit in memory → crash</td><td>Split across multiple machines</td></tr>
+  <tr><td>Processing</td><td>Slow, sequential</td><td>Fast, parallel</td></tr>
+  <tr><td>Result</td><td>May fail</td><td>Computed efficiently</td></tr>
+</table></div>
+
+<h3>Why Spark Came After Hadoop?</h3>
+<p>Hadoop + MapReduce worked, but had three key limitations:</p>
+<ul>
+  <li><strong>Disk-bound</strong> — MapReduce always reads/writes from disk → slow</li>
+  <li><strong>Batch-only</strong> — couldn't handle real-time streaming data</li>
+  <li><strong>Tightly coupled</strong> — limited to Hadoop's HDFS/YARN ecosystem</li>
+</ul>
+<p>Apache Spark was created as a faster, flexible alternative to solve all three.</p>
+
+<h3>Hadoop Components (for context)</h3>
+<ul>
+  <li><strong>HDFS</strong> (Hadoop Distributed File System) — stores massive files across low-cost commodity machines</li>
+  <li><strong>YARN</strong> (Yet Another Resource Negotiator) — manages cluster resources and schedules jobs (MapReduce, Spark, etc.)</li>
+</ul>
+
+<h3>Spark vs Hadoop MapReduce</h3>
+<div class="tw"><table>
+  <tr><th>Feature</th><th>Apache Spark</th><th>Hadoop MapReduce</th></tr>
+  <tr><td>Speed</td><td>10–100× faster (in-memory)</td><td>Slower (disk-based)</td></tr>
+  <tr><td>Processing mode</td><td>Batch + Real-time</td><td>Batch only</td></tr>
+  <tr><td>Data sources</td><td>S3, HDFS, JDBC, Kafka, Cassandra, and more</td><td>HDFS only</td></tr>
+  <tr><td>Cluster managers</td><td>YARN, Kubernetes, Mesos, Standalone</td><td>YARN only</td></tr>
+</table></div>
+
+<h3>Types of Processing in Spark</h3>
+<ul>
+  <li><strong>Batch Processing</strong> — handle data in chunks (e.g., daily reports, ETL pipelines)</li>
+  <li><strong>Stream Processing</strong> — process data in real time (e.g., live tweets, IoT sensors, fraud detection)</li>
+  <li><strong>Data Ingestion</strong> — import data from HDFS, AWS S3, Kafka, JDBC, Twitter, and more</li>
+</ul>
+
+<h3>Spark Ecosystem — Key Components</h3>
+<div class="tw"><table>
+  <tr><th>Component</th><th>Purpose</th><th>Typical Use</th></tr>
+  <tr><td><strong>Spark Core</strong></td><td>Unstructured data &amp; basic distributed processing</td><td>RDDs, low-level transformations</td></tr>
+  <tr><td><strong>Spark SQL</strong></td><td>Structured &amp; semi-structured data</td><td>Tables, CSV, JSON, Parquet</td></tr>
+  <tr><td><strong>Spark Streaming</strong></td><td>Real-time data processing</td><td>Kafka, Kinesis, socket streams</td></tr>
+  <tr><td><strong>MLlib</strong></td><td>Machine learning at scale</td><td>Classification, regression, clustering</td></tr>
+  <tr><td><strong>GraphX</strong></td><td>Graph computation</td><td>Social networks, recommendation graphs</td></tr>
+</table></div>
+<p><em>Note: Spark Core and Spark SQL are most common for batch workloads.</em></p>
+
+<h3>Spark Integration</h3>
+<p>Unlike MapReduce (which works only with HDFS + YARN), Spark integrates seamlessly with modern ecosystems:</p>
+<ul>
+  <li><strong>Cloud platforms</strong> — AWS (EMR, S3, Glue), Azure (HDInsight, ADLS), Google Cloud (Dataproc, GCS)</li>
+  <li><strong>Databases &amp; storage</strong> — Cassandra, MongoDB, HBase, HDFS, S3, Delta Lake</li>
+  <li><strong>Streaming systems</strong> — Apache Kafka, Flume, Amazon Kinesis</li>
+  <li><strong>BI &amp; query tools</strong> — JDBC/ODBC connections to Tableau, Power BI, Redash</li>
+</ul>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     CHAPTER 2 — SETUP & ARCHITECTURE
+════════════════════════════════════════════════ -->
+<div class="chapter"><span class="chapter-num">Chapter 2 · Setup &amp; Architecture</span><div class="chapter-line"></div></div>
+
+<section id="s-install">
+<h2>Installation &amp; Setup</h2>
+
+<h3>Spark / PySpark &amp; Java Compatibility</h3>
+<div class="tw"><table>
+  <tr><th>Spark Version</th><th>Supported Java</th></tr>
+  <tr><td>Spark 2.4.x</td><td>Java 8 only</td></tr>
+  <tr><td>Spark 3.0.x – 3.3.x</td><td>Java 8, Java 11</td></tr>
+  <tr><td>Spark 3.4.x</td><td>Java 8 (8u362+), Java 11, Java 17</td></tr>
+  <tr><td>Spark 3.5.x</td><td>Java 8 (latest), Java 11, Java 17</td></tr>
+  <tr><td>Spark 4.0+</td><td>Java 17 or later</td></tr>
+</table></div>
+<p>This guide uses <strong>PySpark 3.5</strong>.</p>
+
+<!-- ── Windows ──────────────────────────────────── -->
+<h3>Install PySpark on Windows</h3>
+
+<h4>Step 1 — Install VS Code</h4>
+<p>Download and install <strong>VS Code</strong> from <a href="https://code.visualstudio.com/Download" target="_blank">code.visualstudio.com</a>. Then install the <strong>Python extension by Microsoft</strong> via <kbd>Ctrl+Shift+X</kbd>.</p>
+
+<h4>Step 2 — Install Java (JDK 8)</h4>
+<p>Download <strong>OpenJDK 8</strong> from <a href="https://adoptium.net/temurin/releases/?version=8" target="_blank">Adoptium Temurin</a> and install it (e.g. to <code>C:\Program Files\Java\jdk1.8.0_361</code>).</p>
+<p>Set environment variables: <kbd>Win+R</kbd> → <code>sysdm.cpl</code> → Advanced → Environment Variables</p>
+<div class="cb"><div class="cb-head"><span class="lang">text</span><span class="file">System Variables (Windows)</span></div>
+<pre>JAVA_HOME = C:\Program Files\Java\jdk1.8.0_361
+
+<span class="cm"># Add to Path:</span>
+%JAVA_HOME%\bin</pre></div>
+<div class="cb"><div class="cb-head"><span class="lang">cmd</span><span class="file">verify</span></div>
+<pre>java -version</pre></div>
+
+<h4>Step 3 — Install Python 3.10</h4>
+<p>Download from <a href="https://www.python.org/downloads/" target="_blank">python.org/downloads</a>. During installation, check <strong>"Add Python to PATH"</strong>.</p>
+<div class="cb"><div class="cb-head"><span class="lang">cmd</span><span class="file">verify</span></div>
+<pre>python --version</pre></div>
+
+<h4>Step 4 — Install PySpark</h4>
+<div class="cb"><div class="cb-head"><span class="lang">cmd</span><span class="file">terminal</span></div>
+<pre>pip install pyspark==3.5.0</pre></div>
+
+<h4>Step 5 — Install Winutils (Windows only)</h4>
+<p>Some Windows setups require <code>winutils.exe</code>. Download from <a href="https://github.com/cdarlint/winutils" target="_blank">github.com/cdarlint/winutils</a> and extract to a folder:</p>
+<div class="cb"><div class="cb-head"><span class="lang">text</span><span class="file">System Variables (Windows)</span></div>
+<pre>HADOOP_HOME = C:\hadoop\hadoop-3.0.0
+
+<span class="cm"># Add to Path:</span>
+%HADOOP_HOME%\bin
+
+<span class="cm"># Required file must exist:</span>
+C:\hadoop\hadoop-3.0.0\bin\winutils.exe</pre></div>
+
+<h4>Step 6 — Test PySpark</h4>
+<p>Create <code>pyspark_test.py</code> and run it:</p>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">pyspark_test.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+
+spark = <span class="cl">SparkSession</span>.<span class="fn">builder</span>.<span class="fn">appName</span>(<span class="st">"TestPySpark"</span>).<span class="fn">getOrCreate</span>()
+
+data = [(<span class="st">"Alice"</span>, <span class="nu">29</span>), (<span class="st">"Bob"</span>, <span class="nu">35</span>)]
+df = spark.<span class="fn">createDataFrame</span>(data, [<span class="st">"Name"</span>, <span class="st">"Age"</span>])
+df.<span class="fn">show</span>()
+
+spark.<span class="fn">stop</span>()</pre></div>
+<div class="cb"><div class="cb-head"><span class="lang">text</span><span class="file">output</span></div>
+<pre>+-----+---+
+| Name|Age|
++-----+---+
+|Alice| 29|
+|  Bob| 35|
++-----+---+</pre></div>
+
+<!-- ── Linux / macOS ─────────────────────────────── -->
+<h3>Install PySpark on Linux / macOS</h3>
+
+<h4>Prerequisites</h4>
+<ul>
+  <li><strong>Java 11+</strong> — <code>java -version</code> to check</li>
+  <li><strong>Python 3.9+</strong></li>
+  <li><strong>pip</strong> or conda</li>
+</ul>
+<div class="cb"><div class="cb-head"><span class="lang">bash</span><span class="file">terminal</span></div>
+<pre><span class="cm"># Install PySpark (includes Spark binaries)</span>
+pip install pyspark==3.5.0
+
+<span class="cm"># Optional extras</span>
+pip install delta-spark pandas pyarrow findspark jupyter
+
+<span class="cm"># Verify</span>
+python -c <span class="st">"import pyspark; print(pyspark.__version__)"</span></pre></div>
+
+<h4>Environment Variables</h4>
+<div class="cb"><div class="cb-head"><span class="lang">bash</span><span class="file">~/.bashrc</span></div>
+<pre><span class="kw">export</span> JAVA_HOME=<span class="st">"/usr/lib/jvm/java-11-openjdk-amd64"</span>
+<span class="kw">export</span> SPARK_HOME=<span class="st">"$(python -c 'import pyspark; print(pyspark.__path__[0])')"</span>
+<span class="kw">export</span> PYSPARK_PYTHON=python3
+<span class="kw">export</span> PYSPARK_DRIVER_PYTHON=python3</pre></div>
+
+<h4>Running PySpark</h4>
+<div class="cb"><div class="cb-head"><span class="lang">bash</span><span class="file">terminal</span></div>
+<pre><span class="cm"># Interactive shell</span>
+pyspark --master local[*]
+
+<span class="cm"># Submit a script</span>
+spark-submit --master local[*] --driver-memory 2g my_job.py
+
+<span class="cm"># Submit to YARN cluster</span>
+spark-submit \
+  --master yarn \
+  --deploy-mode cluster \
+  --num-executors 10 \
+  --executor-memory 4g \
+  --executor-cores 4 \
+  my_job.py</pre></div>
+
+<h3>Docker Quickstart</h3>
+<div class="cb"><div class="cb-head"><span class="lang">yaml</span><span class="file">docker-compose.yml</span></div>
+<pre><span class="kw">version</span>: <span class="st">"3.8"</span>
+<span class="kw">services</span>:
+  <span class="kw">spark-master</span>:
+    <span class="kw">image</span>: bitnami/spark:3.5
+    <span class="kw">environment</span>: [SPARK_MODE=master]
+    <span class="kw">ports</span>: [<span class="st">"8080:8080"</span>, <span class="st">"7077:7077"</span>]
+  <span class="kw">spark-worker</span>:
+    <span class="kw">image</span>: bitnami/spark:3.5
+    <span class="kw">environment</span>:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    <span class="kw">depends_on</span>: [spark-master]</pre></div>
+</section>
+
+<section id="s-arch">
+<h2>Apache Spark Runtime Architecture</h2>
+
+<h3>What is Apache Spark?</h3>
+<p>Apache Spark is a <strong>distributed computing framework</strong>. That means:</p>
+<ul>
+  <li>Every Spark application is a distributed application</li>
+  <li>Distributed applications need a <strong>cluster</strong> to run efficiently</li>
+</ul>
+<p><em>You can run Spark on your local machine for testing, but in production Spark applications run on clusters.</em></p>
+
+<h3>What is a Cluster?</h3>
+<p>A cluster is a group of networked machines (called <strong>worker nodes</strong>) that work together.</p>
+<div class="tw"><table>
+  <tr><th>Cluster Example</th><th>Value</th></tr>
+  <tr><td>Number of machines</td><td>10 worker nodes</td></tr>
+  <tr><td>Per machine</td><td>16 CPU cores + 64 GB RAM</td></tr>
+  <tr><td>Total capacity</td><td>160 CPU cores + 640 GB RAM</td></tr>
+</table></div>
+
+<h3>Key Components</h3>
+<div class="cards">
+  <div class="card"><h4>Driver</h4><p>Your main program. Creates the SparkSession, translates PySpark code into tasks, requests executors, and sends tasks to them.</p></div>
+  <div class="card"><h4>Cluster Manager</h4><p>Handles resource allocation (CPU + memory). Most common: <strong>Hadoop YARN</strong> and <strong>Kubernetes</strong>. Also: Mesos, Spark Standalone.</p></div>
+  <div class="card"><h4>Application Master</h4><p>On YARN, the cluster manager launches an AM container — the "coordinator" for your Spark job. The Driver runs inside the AM.</p></div>
+  <div class="card"><h4>Executor</h4><p>JVM process on each worker node. Actually performs computations — runs transformations and actions on RDDs/DataFrames — and reports results back to the Driver.</p></div>
+  <div class="card"><h4>Task</h4><p>Smallest unit of work — processes one data partition. All tasks in a stage run in parallel.</p></div>
+  <div class="card"><h4>Stage / Job</h4><p>A <em>Job</em> is triggered by one action and consists of one or more <em>Stages</em>. Stages are sets of tasks separated by shuffle boundaries.</p></div>
+</div>
+
+<h3>Submitting a Spark Application — Step by Step</h3>
+<ol>
+  <li>
+    <strong>spark-submit → Cluster Manager</strong><br>
+    The <code>spark-submit</code> command sends a request to the Cluster Resource Manager (YARN, Kubernetes, or Mesos) to allocate resources.
+  </li>
+  <li>
+    <strong>Application Master Created</strong><br>
+    On YARN, the cluster manager launches an <strong>Application Master (AM)</strong> container on one of the worker nodes. The AM manages resources and monitors execution.
+  </li>
+  <li>
+    <strong>Driver Program Starts</strong><br>
+    Inside the AM container, your <strong>Driver Program</strong> starts running. It translates your PySpark/Scala code into tasks and requests executors from YARN.
+  </li>
+  <li>
+    <strong>Executors Run Tasks</strong><br>
+    YARN allocates <strong>Executor Containers</strong> on worker nodes. Executors perform the actual computations and report results back to the Driver.
+  </li>
+  <li>
+    <strong>Job Completion</strong><br>
+    Once all tasks complete, results are collected by the Driver. The Application Master notifies YARN the job is done. All executor and AM containers are released.
+  </li>
+</ol>
+
+<h3>Simplified Flow</h3>
+<div class="cb"><div class="cb-head"><span class="lang">text</span><span class="file">spark-submit flow</span></div>
+<pre>spark-submit
+  → Cluster Manager (YARN / Kubernetes)
+    → Application Master
+      → Driver Program
+        → Executors (worker nodes)
+          → Run tasks on data partitions
+            → Results returned to Driver
+              → Resources released</pre></div>
+
+<h3>Execution Flow (Action to Result)</h3>
+<ol>
+  <li>You call an <strong>action</strong> (e.g., <code>df.count()</code>)</li>
+  <li>Driver converts the logical plan into a <strong>DAG of stages</strong></li>
+  <li>Catalyst Optimizer rewrites and optimizes the plan</li>
+  <li>DAGScheduler breaks stages into <strong>tasks</strong></li>
+  <li>TaskScheduler sends tasks to executors via the Cluster Manager</li>
+  <li>Executors run tasks on their local data partitions</li>
+  <li>Results are collected back to the Driver</li>
+</ol>
+
+<h3>Partitions</h3>
+<p>Data is split into <strong>partitions</strong> — the unit of parallelism. One task processes one partition.</p>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">partitions.py</span></div>
+<pre><span class="cm"># Check partition count</span>
+<span class="bi">print</span>(df.<span class="fn">rdd</span>.<span class="fn">getNumPartitions</span>())
+
+<span class="cm"># Increase partitions (full shuffle)</span>
+df = df.<span class="fn">repartition</span>(<span class="nu">16</span>)
+
+<span class="cm"># Partition by a column (data colocation)</span>
+df = df.<span class="fn">repartition</span>(<span class="nu">8</span>, <span class="st">"country"</span>)
+
+<span class="cm"># Reduce partitions without shuffle (use after filter)</span>
+df = df.<span class="fn">coalesce</span>(<span class="nu">4</span>)</pre></div>
+</section>
+
+<section id="s-execmodel">
+<h2>Spark Architecture &amp; Execution Model</h2>
+
+<h3>Master-Slave Architecture</h3>
+<p>Apache Spark uses a <strong>master-slave architecture</strong> where the master is called the <strong>Driver</strong> and the slaves are called <strong>Workers</strong>. The master manages, maintains, and monitors the workers; the workers perform the actual processing tasks.</p>
+<p>Spark's architecture is built on two core abstractions:</p>
+<ul>
+  <li><strong>Resilient Distributed Dataset (RDD)</strong></li>
+  <li><strong>Directed Acyclic Graph (DAG)</strong></li>
+</ul>
+
+<h3>RDD — The Building Block</h3>
+<p>RDD stands for:</p>
+<div class="tw"><table>
+  <tr><th>Letter</th><th>Meaning</th><th>Detail</th></tr>
+  <tr><td><strong>R</strong>esilient</td><td>Fault-tolerant</td><td>Capable of rebuilding data on failure</td></tr>
+  <tr><td><strong>D</strong>istributed</td><td>Spread across nodes</td><td>Data distributed among multiple cluster nodes</td></tr>
+  <tr><td><strong>D</strong>ataset</td><td>Partitioned collection</td><td>Collection of partitioned data with values</td></tr>
+</table></div>
+<ul>
+  <li>When you load data into a Spark application, it creates an <strong>RDD</strong> that stores the loaded data</li>
+  <li>RDDs are <strong>immutable</strong> — they cannot be modified once created, but can be transformed into new RDDs at any time</li>
+</ul>
+
+<h3>Transformations vs Actions</h3>
+<div class="tw"><table>
+  <tr><th></th><th>Transformations</th><th>Actions</th></tr>
+  <tr><td><strong>What they do</strong></td><td>Create a new RDD from an existing one without altering the original</td><td>Instruct Spark to apply computation and send the result back to the Driver</td></tr>
+  <tr><td><strong>Examples</strong></td><td><code>groupBy</code>, <code>map</code>, <code>filter</code>, <code>sort</code>, <code>rename</code></td><td><code>collect</code>, <code>show</code>, <code>write</code>, <code>count</code>, <code>save</code></td></tr>
+  <tr><td><strong>Execution</strong></td><td>Lazy — not executed until an action is called</td><td>Triggers execution of all pending transformations</td></tr>
+</table></div>
+
+<h3>Narrow vs Wide Transformations</h3>
+<div class="tw"><table>
+  <tr><th></th><th>Narrow Transformations</th><th>Wide Transformations</th></tr>
+  <tr><td><strong>Partitions</strong></td><td>Each input partition → exactly one output partition</td><td>Input partitions → many output partitions</td></tr>
+  <tr><td><strong>Shuffle?</strong></td><td>No shuffle required</td><td>Requires shuffling data between partitions</td></tr>
+  <tr><td><strong>Performance</strong></td><td>More efficient — runs in parallel per partition</td><td>More complex, more resource-intensive</td></tr>
+  <tr><td><strong>Data formats</strong></td><td>Structured, unstructured, semi-structured</td><td>Typically requires structured data</td></tr>
+  <tr><td><strong>Examples</strong></td><td><code>map</code>, <code>filter</code>, <code>flatMap</code>, <code>union</code></td><td><code>groupByKey</code>, <code>reduceByKey</code>, <code>join</code>, <code>distinct</code></td></tr>
+</table></div>
+
+<h3>Lazy Evaluation</h3>
+<p>Spark will <strong>not start execution</strong> until an <strong>action</strong> is called. As long as you are performing transformations, Spark just records the plan. Once an action is called, Spark looks at all pending transformations, builds a DAG, and executes it.</p>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">lazy_eval.py</span></div>
+<pre><span class="cm"># These transformations are lazy — nothing runs yet</span>
+df2 = df.<span class="fn">filter</span>(df[<span class="st">"age"</span>] &gt; <span class="nu">25</span>)
+df3 = df2.<span class="fn">groupBy</span>(<span class="st">"country"</span>).<span class="fn">count</span>()
+
+<span class="cm"># This ACTION triggers execution of the full DAG</span>
+df3.<span class="fn">show</span>()   <span class="cm"># &lt;-- Spark builds DAG and runs here</span></pre></div>
+
+<h3>Directed Acyclic Graph (DAG)</h3>
+<ul>
+  <li>A <strong>finite directed graph</strong> representing the sequence of computations on data</li>
+  <li>Every Spark job creates a <strong>DAG of task stages</strong> to be executed on the cluster</li>
+  <li>Spark DAGs can contain <strong>many stages</strong>, unlike Hadoop MapReduce which has only two predefined stages (Map and Reduce)</li>
+  <li>Consecutive computation stages optimize the execution plan</li>
+  <li>DAGs enable <strong>fault-tolerance</strong> — if a partition is lost, Spark can recompute only that partition by replaying the DAG lineage</li>
+</ul>
+
+<h3>Spark Application Components</h3>
+<div class="tw"><table>
+  <tr><th>Component</th><th>Description</th></tr>
+  <tr><td><strong>Spark Application</strong></td><td>A program built with Spark APIs (PySpark script, Java/Scala app, spark-shell session). Consists of a Driver container and Executors.</td></tr>
+  <tr><td><strong>SparkSession / SparkContext</strong></td><td>Entry point to Spark functionality. Represents the connection to the Spark cluster. Used to access lower-level APIs like RDD.</td></tr>
+  <tr><td><strong>Job</strong></td><td>A parallel computation triggered by one Spark action (e.g., <code>collect()</code>, <code>save()</code>). Consists of multiple stages.</td></tr>
+  <tr><td><strong>Stage</strong></td><td>A set of tasks that can be executed together without a shuffle. Stages depend on each other and are separated by shuffle boundaries.</td></tr>
+  <tr><td><strong>Task</strong></td><td>The smallest unit of work. Runs in a Spark executor, maps to a single core, and works on a single partition of data.</td></tr>
+</table></div>
+
+<h3>Driver Responsibilities</h3>
+<p>The Driver runs on the master node and is responsible for:</p>
+<ul>
+  <li><strong>Managing SparkContext</strong> — creating and managing the main entry point of the application</li>
+  <li><strong>Breaking down the application</strong> — splitting the app into parallel tasks for worker nodes</li>
+  <li><strong>Scheduling tasks</strong> — assigning tasks to workers based on available resources</li>
+  <li><strong>Monitoring tasks</strong> — tracking execution; rescheduling failed tasks on different nodes</li>
+  <li><strong>Gathering results</strong> — collecting task results and combining them into the final output</li>
+</ul>
+
+<h3>Executor Responsibilities</h3>
+<p>The Executor runs on worker nodes and is responsible for:</p>
+<ul>
+  <li><strong>Running tasks</strong> — executes tasks assigned by the Driver; can run multiple tasks in parallel based on available cores</li>
+  <li><strong>Reporting status</strong> — sends task progress back to the Driver for monitoring</li>
+  <li><strong>Storing intermediate data</strong> — caches intermediate results in memory to avoid costly shuffles between nodes</li>
+  <li><strong>Releasing resources</strong> — frees CPU/memory when tasks complete for maximum efficiency</li>
+</ul>
+
+<h3>Cluster Manager Responsibilities</h3>
+<p>The Cluster Manager handles all resource management for the Spark application:</p>
+<ul>
+  <li><strong>Resource allocation</strong> — receives resource requests from the Driver and allocates CPU cores and memory</li>
+  <li><strong>Executor management</strong> — launches and manages Spark executors on worker nodes</li>
+  <li><strong>Fault tolerance</strong> — monitors worker node health and reallocates resources/restarts failed tasks</li>
+  <li><strong>Node management</strong> — tracks worker node status; handles registration, deregistration, and decommissioning</li>
+</ul>
+<div class="tw"><table>
+  <tr><th>Cluster Manager</th><th>Description</th></tr>
+  <tr><td><strong>Spark Standalone</strong></td><td>Simple built-in cluster manager; easy to set up</td></tr>
+  <tr><td><strong>Apache Mesos</strong></td><td>General-purpose cluster manager; can also run Hadoop MapReduce</td></tr>
+  <tr><td><strong>Hadoop YARN</strong></td><td>Resource manager in Hadoop 2; most widely used in enterprise</td></tr>
+  <tr><td><strong>Kubernetes</strong></td><td>Open-source container orchestration; growing standard for cloud-native Spark</td></tr>
+</table></div>
+
+<h3>Spark Execution Modes</h3>
+<div class="tw"><table>
+  <tr><th>Mode</th><th>Driver Location</th><th>Executor Location</th><th>Use Case</th></tr>
+  <tr><td><strong>Local</strong></td><td>Same JVM (your laptop)</td><td>Same JVM</td><td>Development &amp; testing; no cluster needed</td></tr>
+  <tr><td><strong>Client</strong></td><td>Client machine (outside cluster)</td><td>Inside cluster</td><td>Interactive queries; if client disconnects, job dies</td></tr>
+  <tr><td><strong>Cluster</strong></td><td>Inside the cluster (edge node)</td><td>Inside cluster</td><td>Production; job survives client disconnect</td></tr>
+</table></div>
+
+<h4>Local Mode</h4>
+<p>Everything runs on a single JVM — no concept of nodes or distributed execution. Used for development. A single JVM produces both the Driver and the Executor.</p>
+<div class="cb"><div class="cb-head"><span class="lang">bash</span><span class="file">terminal</span></div>
+<pre><span class="cm"># Launch local Spark shell (all cores)</span>
+pyspark --master local[*]
+
+<span class="cm"># Submit in local mode</span>
+spark-submit --master local[4] my_script.py</pre></div>
+
+<h4>Client Mode</h4>
+<p>The Driver runs on the <strong>client machine</strong> (outside the cluster); Executors run inside the cluster. The Driver connects to the Cluster Manager, starts Executors, and receives results. If the client machine disconnects, the Driver dies and all Executors shut down.</p>
+<div class="cb"><div class="cb-head"><span class="lang">bash</span><span class="file">terminal</span></div>
+<pre>spark-submit --master yarn --deploy-mode client my_script.py</pre></div>
+
+<h4>Cluster Mode</h4>
+<p>Both the Driver and Executors run <strong>inside the cluster</strong>. The job is submitted from a local/edge node. If the client disconnects, the Driver is unaffected — it runs on the cluster. This is the standard mode for <strong>long-running production jobs</strong>.</p>
+<div class="cb"><div class="cb-head"><span class="lang">bash</span><span class="file">terminal</span></div>
+<pre>spark-submit --master yarn --deploy-mode cluster my_script.py</pre></div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     CHAPTER 3 — CORE DATA STRUCTURES
+════════════════════════════════════════════════ -->
+<div class="chapter"><span class="chapter-num">Chapter 3 · Core Data Structures</span><div class="chapter-line"></div></div>
+
+<section id="s-rdd">
+<h2>RDD Fundamentals</h2>
+
+<h3>Why RDDs? — Before Spark</h3>
+<p>Before Spark, Hadoop MapReduce dominated big data processing. It had major limitations:</p>
+<ul>
+  <li><strong>Slow processing</strong> — every operation wrote to disk (HDFS), making iterative jobs very slow</li>
+  <li><strong>Limited APIs</strong> — only <code>map</code> and <code>reduce</code>; complex workflows were difficult</li>
+  <li><strong>No in-memory computation</strong> — recomputation always started from scratch if data was reused</li>
+</ul>
+<p>Spark introduced RDDs to solve these problems:</p>
+<ul>
+  <li><strong>In-memory processing</strong> — much faster than disk I/O</li>
+  <li><strong>Lineage-based fault tolerance</strong> — lost data can be recomputed from the lineage graph</li>
+  <li><strong>Rich transformations</strong> — <code>map</code>, <code>filter</code>, <code>reduceByKey</code>, <code>join</code>, and more</li>
+  <li><strong>Ideal for iterative algorithms</strong> — ML and graph processing become significantly faster</li>
+</ul>
+
+<h3>What is an RDD?</h3>
+<p><strong>RDD = Resilient Distributed Dataset</strong></p>
+<div class="tw"><table>
+  <tr><th>Property</th><th>Meaning</th></tr>
+  <tr><td><strong>Dataset</strong></td><td>Collection of records — like Python lists or Java arrays</td></tr>
+  <tr><td><strong>Distributed</strong></td><td>Data is split into partitions across cluster nodes for parallel processing</td></tr>
+  <tr><td><strong>Resilient (Fault-Tolerant)</strong></td><td>If a partition is lost, Spark recomputes it using lineage</td></tr>
+  <tr><td><strong>Type-Safe</strong></td><td>Define <code>RDD[Int]</code>, <code>RDD[String]</code>, etc. to catch type errors early</td></tr>
+  <tr><td><strong>Lazy Evaluation</strong></td><td>Transformations don't run until an action (<code>count()</code>, <code>collect()</code>) is triggered</td></tr>
+</table></div>
+<p>RDDs support both <strong>unstructured data</strong> (logs, text files, tweets) and <strong>structured data</strong> (rows and columns).</p>
+
+<h3>Analogy — RDD as a Classroom</h3>
+<p>Imagine you are a teacher with 1,000 student papers to mark:</p>
+<ul>
+  <li>Checking all papers alone → takes too long</li>
+  <li>Divide into 10 groups → assign 10 helpers</li>
+  <li>Each helper marks their group in parallel</li>
+  <li>Results are combined and returned to you</li>
+</ul>
+<p>RDD works exactly the same way: splits big data into partitions, processes them in parallel, then combines results.</p>
+<blockquote><strong>Tip:</strong> Use RDDs for low-level control or unstructured data. For most modern workloads, prefer DataFrames/Datasets.</blockquote>
+
+<h3>When to Use RDDs</h3>
+<ul>
+  <li>Low-level transformations not supported by DataFrames</li>
+  <li>Unstructured data processing (logs, tweets, raw text)</li>
+  <li>Custom transformations requiring full control over partitioning</li>
+</ul>
+
+<h3>Creating RDDs</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">rdd_create.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+
+spark = <span class="cl">SparkSession</span>.<span class="fn">builder</span>.<span class="fn">appName</span>(<span class="st">"RDDDemo"</span>).<span class="fn">getOrCreate</span>()
+sc = spark.sparkContext
+
+<span class="cm"># From a Python collection</span>
+rdd = sc.<span class="fn">parallelize</span>([<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>], numSlices=<span class="nu">4</span>)
+
+<span class="cm"># From a text file (HDFS or local)</span>
+text_rdd = sc.<span class="fn">textFile</span>(<span class="st">"hdfs://namenode/logs/*.log"</span>)
+
+<span class="cm"># From a DataFrame</span>
+rdd_from_df = df.<span class="fn">rdd</span></pre></div>
+
+<h3>Example — Word Count (Filtering for "spark")</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">word_count.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+
+spark = <span class="cl">SparkSession</span>.<span class="fn">builder</span>.<span class="fn">appName</span>(<span class="st">"WordCountExample"</span>).<span class="fn">getOrCreate</span>()
+
+data = [
+    <span class="st">"hello world this is pyspark"</span>,
+    <span class="st">"pyspark is great for big data processing"</span>,
+    <span class="st">"hello spark hello python"</span>,
+    <span class="st">"data engineering with pyspark and spark"</span>,
+]
+
+text_rdd = spark.sparkContext.<span class="fn">parallelize</span>(data)
+
+<span class="cm"># Step 1 — split lines into words</span>
+words = text_rdd.<span class="fn">flatMap</span>(<span class="kw">lambda</span> line: line.<span class="fn">split</span>(<span class="st">" "</span>))
+
+<span class="cm"># Step 2 — keep only words containing "spark"</span>
+spark_words = words.<span class="fn">filter</span>(<span class="kw">lambda</span> w: <span class="st">"spark"</span> <span class="kw">in</span> w.<span class="fn">lower</span>())
+
+<span class="cm"># Step 3 — count occurrences</span>
+counts = spark_words.<span class="fn">map</span>(<span class="kw">lambda</span> x: (x, <span class="nu">1</span>)).<span class="fn">reduceByKey</span>(<span class="kw">lambda</span> a, b: a + b)
+
+<span class="bi">print</span>(counts.<span class="fn">collect</span>())
+
+spark.<span class="fn">stop</span>()</pre></div>
+<div class="cb"><div class="cb-head"><span class="lang">text</span><span class="file">output</span></div>
+<pre>[('pyspark', 3), ('spark', 2)]</pre></div>
+
+<h3>How it Executes — Step by Step</h3>
+<ol>
+  <li><strong>Load Big Data</strong> — Spark reads the dataset (<code>textFile</code> / <code>parallelize</code>)</li>
+  <li><strong>Split into Partitions</strong> — data is divided across multiple nodes</li>
+  <li><strong>Transformations (Lazy)</strong> — <code>map()</code>, <code>filter()</code>, <code>flatMap()</code> applied per partition but not executed yet</li>
+  <li><strong>Action Triggers Execution</strong> — <code>collect()</code>, <code>count()</code>, <code>take()</code> run all pending transformations in parallel</li>
+  <li><strong>Fault Tolerance</strong> — if a partition is lost, Spark recomputes it using the recorded lineage</li>
+</ol>
+
+<h3>Common Transformations</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">rdd_transforms.py</span></div>
+<pre>words = sc.<span class="fn">parallelize</span>([<span class="st">"hello world"</span>, <span class="st">"hello spark"</span>, <span class="st">"pyspark guide"</span>])
+
+<span class="cm"># map — 1-to-1 transform</span>
+upper = words.<span class="fn">map</span>(<span class="kw">lambda</span> x: x.<span class="fn">upper</span>())
+
+<span class="cm"># flatMap — 1-to-many + flatten</span>
+word_rdd = words.<span class="fn">flatMap</span>(<span class="kw">lambda</span> x: x.<span class="fn">split</span>())
+
+<span class="cm"># filter</span>
+h_words = word_rdd.<span class="fn">filter</span>(<span class="kw">lambda</span> w: w.<span class="fn">startswith</span>(<span class="st">"h"</span>))
+
+<span class="cm"># reduceByKey — classic MapReduce pattern</span>
+counts = (
+    words.<span class="fn">flatMap</span>(<span class="kw">lambda</span> line: line.<span class="fn">split</span>())
+         .<span class="fn">map</span>(<span class="kw">lambda</span> w: (w, <span class="nu">1</span>))
+         .<span class="fn">reduceByKey</span>(<span class="kw">lambda</span> a, b: a + b)
+)
+
+<span class="cm"># mapPartitions — one call per partition (efficient for DB connections)</span>
+<span class="kw">def</span> <span class="fn">process</span>(iterator):
+    <span class="kw">yield from</span> (w.<span class="fn">upper</span>() <span class="kw">for</span> w <span class="kw">in</span> iterator)
+
+word_rdd.<span class="fn">mapPartitions</span>(process)</pre></div>
+
+<h3>Common Actions</h3>
+<div class="tw"><table>
+  <tr><th>Action</th><th>Returns</th><th>Use When</th></tr>
+  <tr><td><code>collect()</code></td><td>list</td><td>Small RDD — brings all data to driver</td></tr>
+  <tr><td><code>count()</code></td><td>int</td><td>Row count</td></tr>
+  <tr><td><code>first()</code></td><td>element</td><td>First element</td></tr>
+  <tr><td><code>take(n)</code></td><td>list</td><td>First N elements</td></tr>
+  <tr><td><code>reduce(f)</code></td><td>single value</td><td>Aggregate with a function</td></tr>
+  <tr><td><code>saveAsTextFile()</code></td><td>None</td><td>Write to HDFS / local</td></tr>
+</table></div>
+
+<h3>Limitations of RDDs</h3>
+<ul>
+  <li>Spark <strong>cannot optimize inside custom functions</strong> (e.g., lambdas) — no Catalyst optimizer</li>
+  <li>Inefficient operations if not careful (e.g., filtering after a wide shuffle)</li>
+  <li>Debugging large distributed RDD pipelines is harder than DataFrames</li>
+</ul>
+<blockquote><strong>Modern Spark tip:</strong> Prefer DataFrames/Datasets. Use RDDs only for low-level or unstructured data needs. Understanding RDDs helps you understand how Spark works internally.</blockquote>
+</section>
+
+<section id="s-rdddeep">
+<h2>Understanding RDD in Apache Spark</h2>
+
+<h3>Key Features of RDD</h3>
+<div class="tw"><table>
+  <tr><th>#</th><th>Feature</th><th>Detail</th></tr>
+  <tr><td>1</td><td><strong>Immutability</strong></td><td>Once created, an RDD cannot be changed — ensures consistency across distributed nodes</td></tr>
+  <tr><td>2</td><td><strong>Distributed</strong></td><td>Data is divided into partitions and processed in parallel across the cluster</td></tr>
+  <tr><td>3</td><td><strong>Fault Tolerance</strong></td><td>If any partition is lost, Spark recomputes it from the lineage graph</td></tr>
+  <tr><td>4</td><td><strong>In-Memory Computation</strong></td><td>Data is stored in memory for fast processing — avoids disk I/O between stages</td></tr>
+  <tr><td>5</td><td><strong>Lazy Evaluation</strong></td><td>Transformations form a lineage (DAG) and only execute when an action is triggered</td></tr>
+  <tr><td>6</td><td><strong>Persistence</strong></td><td>RDDs can be cached in memory or stored on disk for reuse across multiple actions</td></tr>
+</table></div>
+
+<h3>RDD Operations Reference</h3>
+<h4>Transformations (create a new RDD, lazy)</h4>
+<div class="tw"><table>
+  <tr><th>Transformation</th><th>Description</th></tr>
+  <tr><td><code>map(f)</code></td><td>Apply function <code>f</code> to each element; returns one element per input</td></tr>
+  <tr><td><code>filter(f)</code></td><td>Keep only elements where <code>f</code> returns <code>True</code></td></tr>
+  <tr><td><code>flatMap(f)</code></td><td>Like <code>map</code> but flattens the result (one element → zero or more)</td></tr>
+  <tr><td><code>distinct()</code></td><td>Remove duplicate elements</td></tr>
+  <tr><td><code>union(other)</code></td><td>Return elements from both RDDs (with duplicates)</td></tr>
+  <tr><td><code>intersection(other)</code></td><td>Return only elements present in both RDDs</td></tr>
+  <tr><td><code>subtract(other)</code></td><td>Return elements in this RDD but not in <code>other</code></td></tr>
+  <tr><td><code>reduceByKey(f)</code></td><td>Merge values for each key using function <code>f</code></td></tr>
+  <tr><td><code>groupByKey()</code></td><td>Group values by key (use <code>reduceByKey</code> when possible — more efficient)</td></tr>
+</table></div>
+
+<h4>Actions (trigger execution, return result)</h4>
+<div class="tw"><table>
+  <tr><th>Action</th><th>Description</th></tr>
+  <tr><td><code>collect()</code></td><td>Return all elements to the driver (use only for small RDDs)</td></tr>
+  <tr><td><code>count()</code></td><td>Count the number of elements</td></tr>
+  <tr><td><code>first()</code></td><td>Return the first element</td></tr>
+  <tr><td><code>take(n)</code></td><td>Return the first <code>n</code> elements</td></tr>
+  <tr><td><code>reduce(f)</code></td><td>Aggregate all elements using function <code>f</code></td></tr>
+  <tr><td><code>saveAsTextFile(path)</code></td><td>Save RDD contents to external storage (HDFS, local)</td></tr>
+</table></div>
+
+<h3>Internal Working of RDD</h3>
+<ol>
+  <li>When you apply <strong>transformations</strong>, Spark builds a <strong>DAG</strong> — nothing executes immediately, it just records the lineage</li>
+  <li>When you call an <strong>action</strong>, Spark’s scheduler breaks the DAG into <strong>stages</strong> and <strong>tasks</strong></li>
+  <li>Tasks are distributed across cluster nodes and executed in parallel</li>
+  <li><strong>Fault tolerance</strong>: if a node fails, missing partitions are recomputed by replaying the lineage</li>
+</ol>
+
+<h3>Practical Example — Student Marks Filter</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">rdd_students.py</span></div>
+<pre><span class="kw">from</span> pyspark <span class="kw">import</span> SparkContext
+
+sc = <span class="cl">SparkContext</span>(<span class="st">"local"</span>, <span class="st">"RDD Example"</span>)
+
+data = [
+    <span class="st">"Rahul,85"</span>,
+    <span class="st">"Priya,90"</span>,
+    <span class="st">"Arjun,70"</span>,
+    <span class="st">"Meena,95"</span>,
+    <span class="st">"Suresh,60"</span>,
+    <span class="st">"Anita,88"</span>,
+]
+
+rdd = sc.<span class="fn">parallelize</span>(data)
+
+<span class="cm"># Transform: split each line into (name, marks) tuple</span>
+marks_rdd = rdd.<span class="fn">map</span>(<span class="kw">lambda</span> x: (x.<span class="fn">split</span>(<span class="st">","</span>)[<span class="nu">0</span>], <span class="bi">int</span>(x.<span class="fn">split</span>(<span class="st">","</span>)[<span class="nu">1</span>])))
+
+<span class="cm"># Transform: filter students with marks >= 80</span>
+top_students = marks_rdd.<span class="fn">filter</span>(<span class="kw">lambda</span> x: x[<span class="nu">1</span>] &gt;= <span class="nu">80</span>)
+
+<span class="cm"># Action: collect and print</span>
+result = top_students.<span class="fn">collect</span>()
+<span class="bi">print</span>(<span class="st">"Top Students (Marks &gt;= 80):"</span>)
+<span class="kw">for</span> name, marks <span class="kw">in</span> result:
+    <span class="bi">print</span>(name, marks)
+
+sc.<span class="fn">stop</span>()</pre></div>
+<div class="cb"><div class="cb-head"><span class="lang">text</span><span class="file">output</span></div>
+<pre>Top Students (Marks &gt;= 80):
+Rahul 85
+Priya 90
+Meena 95
+Anita 88</pre></div>
+
+<h3>Advantages of RDD</h3>
+<ul>
+  <li>Fast processing via in-memory computation</li>
+  <li>Easy fault recovery using lineage — no need to reprocess entire dataset</li>
+  <li>Supports functional programming style (<code>map</code>, <code>filter</code>, <code>reduce</code>)</li>
+  <li>Works on both structured and unstructured data</li>
+  <li>Flexible for low-level, fine-grained transformations</li>
+</ul>
+
+<h3>Limitations of RDD</h3>
+<ul>
+  <li><strong>Verbose code</strong> compared to DataFrames/Datasets</li>
+  <li><strong>No automatic optimization</strong> — Catalyst optimizer only works with DataFrames</li>
+  <li><strong>Inefficient for structured data</strong> — DataFrames handle schema-aware data far better</li>
+</ul>
+
+<h3>When to Use RDD</h3>
+<ul>
+  <li>Fine-grained transformations not supported by DataFrames</li>
+  <li>Unstructured data (logs, raw text, binary data)</li>
+  <li>Low-level control over data distribution and computation</li>
+</ul>
+</section>
+
+<section id="s-dfbasics">
+<h2>Introduction to PySpark DataFrames</h2>
+
+<h3>What is a DataFrame?</h3>
+<p>Think of a PySpark DataFrame as a <strong>giant, distributed spreadsheet</strong>. According to Spark documentation, a DataFrame is a <em>dataset organized into named columns</em> — much like a table in a relational database or a DataFrame in Python/R. The key difference is that this "spreadsheet" is automatically <strong>split across multiple machines</strong>, so you can work with gigabytes or terabytes of data without running out of memory.</p>
+
+<h3>Rows, Columns, and Table Analogy</h3>
+<ul>
+  <li><strong>Rows</strong> — each row is a record in your dataset</li>
+  <li><strong>Columns</strong> — each column represents a field or attribute</li>
+  <li><strong>DataFrame</strong> — the overall table combining rows and columns into a structured dataset</li>
+</ul>
+<p>Because PySpark DataFrames are <strong>distributed</strong>, data is broken into <strong>partitions</strong>. Each partition is processed in parallel by different executors, allowing Spark to handle data that would overwhelm a single machine.</p>
+
+<h3>PySpark vs Pandas DataFrames</h3>
+<div class="tw"><table>
+  <tr><th>Feature</th><th>Pandas DataFrame</th><th>PySpark DataFrame</th></tr>
+  <tr><td><strong>Execution environment</strong></td><td>Local machine (single process)</td><td>Distributed cluster</td></tr>
+  <tr><td><strong>Data size</strong></td><td>MB to a few GB (must fit in RAM)</td><td>GB to TB (distributed across nodes)</td></tr>
+  <tr><td><strong>Performance</strong></td><td>Can slow down / OOM on large data</td><td>Built for big data — parallelizes work</td></tr>
+  <tr><td><strong>API style</strong></td><td>Pythonic and flexible</td><td>SQL-like and functional</td></tr>
+  <tr><td><strong>Mutability</strong></td><td>Mutable in-place</td><td>Immutable — every transform creates a new DF</td></tr>
+  <tr><td><strong>Lazy evaluation</strong></td><td>Eager (runs immediately)</td><td>Lazy (builds DAG, runs on action)</td></tr>
+</table></div>
+
+<h3>When to Use Each</h3>
+<ul>
+  <li><strong>Choose Pandas</strong> for exploratory analysis or projects where data fits comfortably in RAM and you want a quick, interactive workflow</li>
+  <li><strong>Choose PySpark</strong> for ETL jobs, large-scale data engineering, or ML tasks that require distributed processing</li>
+</ul>
+
+<h3>Side-by-Side Example</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">pyspark_df.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+
+spark = <span class="cl">SparkSession</span>.<span class="fn">builder</span>.<span class="fn">appName</span>(<span class="st">"DataFrameExample"</span>).<span class="fn">getOrCreate</span>()
+
+data = [(<span class="st">"Alice"</span>, <span class="nu">25</span>), (<span class="st">"Bob"</span>, <span class="nu">30</span>)]
+columns = [<span class="st">"Name"</span>, <span class="st">"Age"</span>]
+
+df = spark.<span class="fn">createDataFrame</span>(data, columns)
+df.<span class="fn">show</span>()</pre></div>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">pandas_df.py</span></div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+data = [(<span class="st">"Alice"</span>, <span class="nu">25</span>), (<span class="st">"Bob"</span>, <span class="nu">30</span>)]
+columns = [<span class="st">"Name"</span>, <span class="st">"Age"</span>]
+
+df = pd.<span class="cl">DataFrame</span>(data, columns=columns)
+<span class="bi">print</span>(df)</pre></div>
+
+<h3>Creating DataFrames</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_create.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> StructType, StructField, StringType, IntegerType, DoubleType
+
+<span class="cm"># From list of tuples</span>
+data = [(<span class="st">"Alice"</span>,<span class="nu">30</span>,<span class="st">"Engineering"</span>,<span class="nu">95000.0</span>),
+        (<span class="st">"Bob"</span>,<span class="nu">25</span>,<span class="st">"Marketing"</span>,<span class="nu">72000.0</span>),
+        (<span class="st">"Carol"</span>,<span class="nu">35</span>,<span class="st">"Engineering"</span>,<span class="nu">120000.0</span>),
+        (<span class="st">"Dave"</span>,<span class="nu">28</span>,<span class="st">"HR"</span>,<span class="nu">68000.0</span>)]
+
+df = spark.<span class="fn">createDataFrame</span>(data, [<span class="st">"name"</span>,<span class="st">"age"</span>,<span class="st">"department"</span>,<span class="st">"salary"</span>])
+
+<span class="cm"># With explicit schema (recommended for production)</span>
+schema = <span class="cl">StructType</span>([
+    <span class="cl">StructField</span>(<span class="st">"name"</span>,       <span class="cl">StringType</span>(),  nullable=<span class="kw">False</span>),
+    <span class="cl">StructField</span>(<span class="st">"age"</span>,        <span class="cl">IntegerType</span>(), nullable=<span class="kw">True</span>),
+    <span class="cl">StructField</span>(<span class="st">"department"</span>, <span class="cl">StringType</span>(),  nullable=<span class="kw">True</span>),
+    <span class="cl">StructField</span>(<span class="st">"salary"</span>,     <span class="cl">DoubleType</span>(),  nullable=<span class="kw">True</span>),
+])
+df = spark.<span class="fn">createDataFrame</span>(data, schema)
+
+<span class="cm"># From pandas</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+df = spark.<span class="fn">createDataFrame</span>(pd.<span class="fn">DataFrame</span>({<span class="st">"x"</span>:[<span class="nu">1</span>,<span class="nu">2</span>],<span class="st">"y"</span>:[<span class="st">"a"</span>,<span class="st">"b"</span>]}))
+
+<span class="cm"># Inspect</span>
+df.<span class="fn">show</span>()
+df.<span class="fn">printSchema</span>()
+df.<span class="fn">dtypes</span>
+df.<span class="fn">describe</span>().<span class="fn">show</span>()</pre></div>
+
+<h3>Column Operations</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_columns.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col, when, expr, lit
+<span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="cm"># Select</span>
+df.<span class="fn">select</span>(<span class="st">"name"</span>, <span class="st">"salary"</span>)
+df.<span class="fn">select</span>(<span class="fn">col</span>(<span class="st">"salary"</span>) * <span class="nu">1.1</span>.<span class="fn">alias</span>(<span class="st">"new_salary"</span>))
+
+<span class="cm"># Add / rename / drop</span>
+df = df.<span class="fn">withColumn</span>(<span class="st">"salary_k"</span>, <span class="fn">col</span>(<span class="st">"salary"</span>) / <span class="nu">1000</span>)
+df = df.<span class="fn">withColumnRenamed</span>(<span class="st">"name"</span>, <span class="st">"employee"</span>)
+df = df.<span class="fn">drop</span>(<span class="st">"salary_k"</span>)
+
+<span class="cm"># Conditional column</span>
+df = df.<span class="fn">withColumn</span>(<span class="st">"band"</span>,
+    <span class="fn">when</span>(<span class="fn">col</span>(<span class="st">"salary"</span>) &lt; <span class="nu">70000</span>, <span class="st">"Low"</span>)
+    .<span class="fn">when</span>(<span class="fn">col</span>(<span class="st">"salary"</span>) &lt; <span class="nu">100000</span>, <span class="st">"Mid"</span>)
+    .<span class="fn">otherwise</span>(<span class="st">"High"</span>))
+
+<span class="cm"># Cast</span>
+df = df.<span class="fn">withColumn</span>(<span class="st">"age"</span>, <span class="fn">col</span>(<span class="st">"age"</span>).<span class="fn">cast</span>(<span class="st">"double"</span>))
+
+<span class="cm"># String functions</span>
+df.<span class="fn">withColumn</span>(<span class="st">"upper_name"</span>, F.<span class="fn">upper</span>(<span class="fn">col</span>(<span class="st">"name"</span>)))
+df.<span class="fn">withColumn</span>(<span class="st">"initial"</span>, F.<span class="fn">regexp_extract</span>(<span class="fn">col</span>(<span class="st">"name"</span>), <span class="st">r"(\w)\w+"</span>, <span class="nu">1</span>))</pre></div>
+</section>
+
+<section id="s-dfcreation">
+<h2>DataFrame Creation in PySpark</h2>
+
+<h3>Key Features of PySpark DataFrames</h3>
+<div class="tw"><table>
+  <tr><th>Feature</th><th>Detail</th></tr>
+  <tr><td><strong>Distributed</strong></td><td>Runs across a cluster rather than a single machine</td></tr>
+  <tr><td><strong>Schema-based</strong></td><td>Each column has a name and a data type</td></tr>
+  <tr><td><strong>Immutable</strong></td><td>Transformations create new DataFrames instead of modifying existing ones</td></tr>
+  <tr><td><strong>Lazy evaluated</strong></td><td>Computation isn’t executed until you call an action (<code>show()</code>, <code>count()</code>)</td></tr>
+  <tr><td><strong>Optimized</strong></td><td>Uses the Catalyst optimizer and Tungsten engine for efficient execution</td></tr>
+</table></div>
+
+<h3>1. From Python List of Tuples</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_from_tuples.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> SparkSession
+
+spark = <span class="cl">SparkSession</span>.<span class="fn">builder</span>.<span class="fn">appName</span>(<span class="st">"CreateDataFrame"</span>).<span class="fn">getOrCreate</span>()
+
+data = [(<span class="st">"Alice"</span>, <span class="nu">25</span>), (<span class="st">"Bob"</span>, <span class="nu">30</span>), (<span class="st">"Charlie"</span>, <span class="nu">29</span>)]
+columns = [<span class="st">"name"</span>, <span class="st">"age"</span>]
+
+df = spark.<span class="fn">createDataFrame</span>(data, columns)
+df.<span class="fn">show</span>()</pre></div>
+
+<h3>2. From Python List of Dictionaries</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_from_dicts.py</span></div>
+<pre>data = [{<span class="st">"name"</span>: <span class="st">"Alice"</span>, <span class="st">"age"</span>: <span class="nu">25</span>}, {<span class="st">"name"</span>: <span class="st">"Bob"</span>, <span class="st">"age"</span>: <span class="nu">30</span>}]
+
+df = spark.<span class="fn">createDataFrame</span>(data)
+df.<span class="fn">show</span>()</pre></div>
+
+<h3>3. Load from CSV File</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_from_csv.py</span></div>
+<pre>df = spark.<span class="fn">read</span>.<span class="fn">csv</span>(<span class="st">"s3a://bucket/data.csv"</span>, header=<span class="kw">True</span>, inferSchema=<span class="kw">True</span>)
+df.<span class="fn">show</span>()</pre></div>
+
+<h3>4. Load from Parquet</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_from_parquet.py</span></div>
+<pre>df = spark.<span class="fn">read</span>.<span class="fn">parquet</span>(<span class="st">"s3a://bucket/sales/"</span>)
+df.<span class="fn">printSchema</span>()
+df.<span class="fn">show</span>()</pre></div>
+
+<h3>5. Load from JSON File</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_from_json.py</span></div>
+<pre><span class="cm"># multiline=true for pretty-printed / array JSON</span>
+df = spark.<span class="fn">read</span>.<span class="fn">option</span>(<span class="st">"multiline"</span>, <span class="st">"true"</span>).<span class="fn">json</span>(<span class="st">"s3a://bucket/products.json"</span>)
+df.<span class="fn">show</span>(truncate=<span class="kw">False</span>)</pre></div>
+
+<h3>6. Create Empty DataFrame with Schema</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_empty.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> StructType, StructField, StringType, IntegerType
+
+schema = <span class="cl">StructType</span>([
+    <span class="cl">StructField</span>(<span class="st">"name"</span>, <span class="cl">StringType</span>(), <span class="kw">True</span>),
+    <span class="cl">StructField</span>(<span class="st">"age"</span>,  <span class="cl">IntegerType</span>(), <span class="kw">True</span>),
+])
+
+df = spark.<span class="fn">createDataFrame</span>([], schema)
+df.<span class="fn">printSchema</span>()</pre></div>
+
+<h3>7. From JDBC / SQL Database</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_from_jdbc.py</span></div>
+<pre>df = (
+    spark.<span class="fn">read</span>
+    .<span class="fn">format</span>(<span class="st">"jdbc"</span>)
+    .<span class="fn">options</span>(
+        url=<span class="st">"jdbc:postgresql://your-host:5432/yourdb"</span>,
+        driver=<span class="st">"org.postgresql.Driver"</span>,
+        dbtable=<span class="st">"public.employees"</span>,
+        user=<span class="st">"username"</span>,
+        password=<span class="st">"password"</span>,
+    )
+    .<span class="fn">load</span>()
+)
+df.<span class="fn">show</span>()</pre></div>
+
+<h3>8. From Hive Table</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_from_hive.py</span></div>
+<pre><span class="cm"># Hive support must be enabled in SparkSession</span>
+spark = (
+    <span class="cl">SparkSession</span>.<span class="fn">builder</span>
+    .<span class="fn">appName</span>(<span class="st">"HiveExample"</span>)
+    .<span class="fn">enableHiveSupport</span>()
+    .<span class="fn">getOrCreate</span>()
+)
+
+df = spark.<span class="fn">sql</span>(<span class="st">"SELECT * FROM default.employees"</span>)
+df.<span class="fn">show</span>()</pre></div>
+</section>
+
+<section id="s-dfexplore">
+<h2>Exploring DataFrames</h2>
+<p>Exploring data is a crucial first step before performing transformations, joins, or analytics. Because PySpark runs on a cluster, operations are <strong>lazily evaluated</strong> and distributed across partitions.</p>
+
+<h3>1. Displaying Data</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">display.py</span></div>
+<pre><span class="cm"># show() — display first n rows (default 20)</span>
+df.<span class="fn">show</span>()                    <span class="cm"># first 20 rows, truncated</span>
+df.<span class="fn">show</span>(<span class="nu">50</span>)                 <span class="cm"># first 50 rows</span>
+df.<span class="fn">show</span>(truncate=<span class="kw">False</span>)     <span class="cm"># full column values, no truncation</span>
+
+<span class="cm"># head() — returns first row (or n rows) as Python objects</span>
+<span class="bi">print</span>(df.<span class="fn">head</span>())             <span class="cm"># first Row object</span>
+<span class="bi">print</span>(df.<span class="fn">head</span>(<span class="nu">3</span>))           <span class="cm"># list of 3 Row objects</span>
+
+<span class="cm"># take(n) — fetch n rows as a list of Row objects</span>
+<span class="bi">print</span>(df.<span class="fn">take</span>(<span class="nu">2</span>))
+
+<span class="cm"># first() — returns a single Row object (like head(1))</span>
+<span class="bi">print</span>(df.<span class="fn">first</span>())</pre></div>
+
+<h3>2. Inspecting Schema</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">schema.py</span></div>
+<pre><span class="cm"># printSchema() — tree format: column name, type, nullable</span>
+df.<span class="fn">printSchema</span>()
+
+<span class="cm"># dtypes — list of (column_name, data_type) pairs</span>
+<span class="bi">print</span>(df.<span class="fn">dtypes</span>)
+
+<span class="cm"># schema — StructType object (programmatic access)</span>
+<span class="bi">print</span>(df.<span class="fn">schema</span>)
+
+<span class="cm"># columns — list of all column names</span>
+<span class="bi">print</span>(df.<span class="fn">columns</span>)
+
+<span class="cm"># count() — total number of rows (triggers full scan — expensive)</span>
+<span class="bi">print</span>(df.<span class="fn">count</span>())
+
+<span class="cm"># number of columns</span>
+<span class="bi">print</span>(<span class="st">"Columns:"</span>, <span class="bi">len</span>(df.<span class="fn">columns</span>))
+
+<span class="cm"># number of partitions</span>
+<span class="bi">print</span>(<span class="st">"Partitions:"</span>, df.<span class="fn">rdd</span>.<span class="fn">getNumPartitions</span>())</pre></div>
+
+<h3>3. Summary Statistics</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">stats.py</span></div>
+<pre><span class="cm"># describe() — count, mean, stddev, min, max for numeric columns</span>
+df.<span class="fn">describe</span>().<span class="fn">show</span>()
+
+<span class="cm"># summary() — same as describe() plus 25/50/75 percentiles (Spark 3+)</span>
+df.<span class="fn">summary</span>().<span class="fn">show</span>()</pre></div>
+
+<h3>4. Selecting Columns</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">select.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> col
+
+<span class="cm"># Single column</span>
+df.<span class="fn">select</span>(<span class="st">"name"</span>).<span class="fn">show</span>()
+
+<span class="cm"># Multiple columns</span>
+df.<span class="fn">select</span>(<span class="st">"name"</span>, <span class="st">"age"</span>).<span class="fn">show</span>()
+
+<span class="cm"># Column expressions — transform inside select</span>
+df.<span class="fn">select</span>(<span class="fn">col</span>(<span class="st">"age"</span>) + <span class="nu">5</span>).<span class="fn">show</span>()</pre></div>
+
+<h3>5. Filtering Data</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">filter.py</span></div>
+<pre><span class="cm"># filter() and where() are interchangeable (SQL WHERE equivalent)</span>
+df.<span class="fn">filter</span>(df.age &gt; <span class="nu">25</span>).<span class="fn">show</span>()
+df.<span class="fn">where</span>(<span class="st">"age &gt; 25"</span>).<span class="fn">show</span>()
+
+<span class="cm"># Find null values</span>
+df.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="st">"age"</span>).<span class="fn">isNull</span>()).<span class="fn">show</span>()</pre></div>
+
+<h3>6. Sorting Data</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">sort.py</span></div>
+<pre><span class="cm"># Ascending (default)</span>
+df.<span class="fn">orderBy</span>(<span class="st">"age"</span>).<span class="fn">show</span>()
+
+<span class="cm"># Descending</span>
+df.<span class="fn">orderBy</span>(<span class="fn">col</span>(<span class="st">"age"</span>).<span class="fn">desc</span>()).<span class="fn">show</span>()</pre></div>
+
+<h3>7. Removing Duplicates &amp; Unique Values</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">dedup.py</span></div>
+<pre><span class="cm"># Drop all duplicate rows</span>
+df.<span class="fn">dropDuplicates</span>().<span class="fn">show</span>()
+
+<span class="cm"># Drop duplicates based on specific columns</span>
+df.<span class="fn">dropDuplicates</span>([<span class="st">"name"</span>]).<span class="fn">show</span>()
+
+<span class="cm"># Distinct values in a column</span>
+df.<span class="fn">select</span>(<span class="st">"name"</span>).<span class="fn">distinct</span>().<span class="fn">show</span>()
+
+<span class="cm"># Count unique values</span>
+df.<span class="fn">select</span>(<span class="st">"name"</span>).<span class="fn">distinct</span>().<span class="fn">count</span>()</pre></div>
+
+<h3>8. Understanding Execution Plan — explain()</h3>
+<p>Spark uses lazy evaluation — transformations don’t run immediately. <code>explain()</code> shows the logical and physical execution plans, including Catalyst optimizer decisions. Essential for performance tuning.</p>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">explain.py</span></div>
+<pre><span class="cm"># explain(True) shows: logical, optimized logical, and physical plans</span>
+df.<span class="fn">filter</span>(df.age &gt; <span class="nu">25</span>).<span class="fn">explain</span>(<span class="kw">True</span>)</pre></div>
+
+<h3>9. Converting to Pandas (small data only)</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">to_pandas.py</span></div>
+<pre><span class="cm"># toPandas() — collects ALL data to driver memory
+# Never use on large DataFrames</span>
+pdf = df.<span class="fn">toPandas</span>()
+<span class="bi">print</span>(pdf)</pre></div>
+</section>
+
+<section id="s-dfops">
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">df_ops.py</span></div>
+<pre><span class="cm"># Filter / Where</span>
+df.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="st">"salary"</span>) &gt; <span class="nu">80000</span>)
+df.<span class="fn">filter</span>((<span class="fn">col</span>(<span class="st">"age"</span>) &gt; <span class="nu">25</span>) &amp; (<span class="fn">col</span>(<span class="st">"department"</span>) == <span class="st">"Engineering"</span>))
+
+<span class="cm"># Sort</span>
+df.<span class="fn">orderBy</span>(<span class="fn">col</span>(<span class="st">"salary"</span>).<span class="fn">desc</span>())
+df.<span class="fn">sort</span>(<span class="st">"department"</span>, <span class="fn">col</span>(<span class="st">"salary"</span>).<span class="fn">desc</span>())
+
+<span class="cm"># Limit / Sample</span>
+df.<span class="fn">limit</span>(<span class="nu">100</span>)
+df.<span class="fn">sample</span>(fraction=<span class="nu">0.1</span>, seed=<span class="nu">42</span>)
+
+<span class="cm"># Distinct / Dedup</span>
+df.<span class="fn">distinct</span>()
+df.<span class="fn">dropDuplicates</span>([<span class="st">"name"</span>, <span class="st">"department"</span>])
+
+<span class="cm"># Union</span>
+df1.<span class="fn">union</span>(df2)            <span class="cm"># by position</span>
+df1.<span class="fn">unionByName</span>(df2)     <span class="cm"># by column name (safer)</span>
+
+<span class="cm"># Cache</span>
+df.<span class="fn">cache</span>()               <span class="cm"># MEMORY_AND_DISK</span>
+df.<span class="fn">count</span>()               <span class="cm"># materialize</span>
+df.<span class="fn">unpersist</span>()           <span class="cm"># release</span></pre></div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     CHAPTER 4 — SQL & ANALYTICS
+════════════════════════════════════════════════ -->
+<div class="chapter"><span class="chapter-num">Chapter 4 · SQL &amp; Analytics</span><div class="chapter-line"></div></div>
+
+<section id="s-sql">
+<h2>PySpark SQL</h2>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">spark_sql.py</span></div>
+<pre><span class="cm"># Register temp view</span>
+df.<span class="fn">createOrReplaceTempView</span>(<span class="st">"employees"</span>)
+
+<span class="cm"># Run SQL</span>
+spark.<span class="fn">sql</span>(<span class="st">"""
+    SELECT department,
+           COUNT(*)         AS headcount,
+           AVG(salary)      AS avg_salary,
+           MAX(salary)      AS top_salary
+    FROM employees
+    WHERE salary IS NOT NULL
+    GROUP BY department
+    ORDER BY avg_salary DESC
+"""</span>).<span class="fn">show</span>()
+
+<span class="cm"># Persistent catalog table</span>
+df.<span class="fn">write</span>.<span class="fn">mode</span>(<span class="st">"overwrite"</span>).<span class="fn">saveAsTable</span>(<span class="st">"analytics.employees"</span>)
+
+<span class="cm"># DDL via SQL</span>
+spark.<span class="fn">sql</span>(<span class="st">"CREATE DATABASE IF NOT EXISTS analytics"</span>)
+spark.<span class="fn">sql</span>(<span class="st">"DESCRIBE EXTENDED employees"</span>).<span class="fn">show</span>(truncate=<span class="kw">False</span>)
+spark.<span class="fn">catalog</span>.<span class="fn">listTables</span>()</pre></div>
+</section>
+
+<section id="s-joins">
+<h2>Joins in PySpark</h2>
+<div class="tw"><table>
+  <tr><th>Join Type</th><th>How</th><th>Result</th></tr>
+  <tr><td>inner</td><td><code>how="inner"</code></td><td>Only matching rows</td></tr>
+  <tr><td>left</td><td><code>how="left"</code></td><td>All left + matching right</td></tr>
+  <tr><td>right</td><td><code>how="right"</code></td><td>All right + matching left</td></tr>
+  <tr><td>outer / full</td><td><code>how="outer"</code></td><td>All rows from both sides</td></tr>
+  <tr><td>left_semi</td><td><code>how="left_semi"</code></td><td>Left rows that have a match (no right cols)</td></tr>
+  <tr><td>left_anti</td><td><code>how="left_anti"</code></td><td>Left rows with NO match</td></tr>
+  <tr><td>cross</td><td><code>how="cross"</code></td><td>Cartesian product — use with care</td></tr>
+</table></div>
+
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">joins.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast
+
+emp  = spark.read.<span class="fn">parquet</span>(<span class="st">"data/employees"</span>)
+dept = spark.read.<span class="fn">parquet</span>(<span class="st">"data/departments"</span>)
+
+<span class="cm"># Inner join on shared column name</span>
+result = emp.<span class="fn">join</span>(dept, on=<span class="st">"dept_id"</span>, how=<span class="st">"inner"</span>)
+
+<span class="cm"># Left join with compound condition</span>
+result = emp.<span class="fn">join</span>(dept,
+    (emp.dept_id == dept.dept_id) &amp; (emp.region == dept.region),
+    how=<span class="st">"left"</span>)
+
+<span class="cm"># Broadcast join — replicate small table to all executors</span>
+result = emp.<span class="fn">join</span>(<span class="fn">broadcast</span>(dept), on=<span class="st">"dept_id"</span>)
+
+<span class="cm"># Resolve ambiguous columns with aliases</span>
+e = emp.<span class="fn">alias</span>(<span class="st">"e"</span>)
+d = dept.<span class="fn">alias</span>(<span class="st">"d"</span>)
+result = e.<span class="fn">join</span>(d, <span class="fn">col</span>(<span class="st">"e.dept_id"</span>) == <span class="fn">col</span>(<span class="st">"d.dept_id"</span>))</pre></div>
+</section>
+
+<section id="s-funcs">
+<h2>PySpark Functions</h2>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">functions.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="cm"># ── String ────────────────────────────────────────────────</span>
+F.<span class="fn">upper</span>(<span class="fn">col</span>(<span class="st">"name"</span>))
+F.<span class="fn">lower</span>(<span class="fn">col</span>(<span class="st">"name"</span>))
+F.<span class="fn">trim</span>(<span class="fn">col</span>(<span class="st">"name"</span>))
+F.<span class="fn">length</span>(<span class="fn">col</span>(<span class="st">"name"</span>))
+F.<span class="fn">substring</span>(<span class="fn">col</span>(<span class="st">"name"</span>), <span class="nu">1</span>, <span class="nu">3</span>)
+F.<span class="fn">concat</span>(<span class="fn">col</span>(<span class="st">"first"</span>), F.<span class="fn">lit</span>(<span class="st">" "</span>), <span class="fn">col</span>(<span class="st">"last"</span>))
+F.<span class="fn">regexp_replace</span>(<span class="fn">col</span>(<span class="st">"phone"</span>), <span class="st">r"[^0-9]"</span>, <span class="st">""</span>)
+F.<span class="fn">regexp_extract</span>(<span class="fn">col</span>(<span class="st">"email"</span>), <span class="st">r"@(.+)"</span>, <span class="nu">1</span>)
+F.<span class="fn">split</span>(<span class="fn">col</span>(<span class="st">"tags"</span>), <span class="st">","</span>)    <span class="cm"># → ArrayType</span>
+
+<span class="cm"># ── Math ──────────────────────────────────────────────────</span>
+F.<span class="fn">round</span>(<span class="fn">col</span>(<span class="st">"salary"</span>), <span class="nu">2</span>)
+F.<span class="fn">abs</span>(<span class="fn">col</span>(<span class="st">"delta"</span>))
+F.<span class="fn">sqrt</span>(<span class="fn">col</span>(<span class="st">"variance"</span>))
+F.<span class="fn">log</span>(<span class="fn">col</span>(<span class="st">"count"</span>))
+F.<span class="fn">pow</span>(<span class="fn">col</span>(<span class="st">"base"</span>), <span class="nu">2</span>)
+
+<span class="cm"># ── Array / Map ───────────────────────────────────────────</span>
+F.<span class="fn">size</span>(<span class="fn">col</span>(<span class="st">"tags"</span>))
+F.<span class="fn">explode</span>(<span class="fn">col</span>(<span class="st">"tags"</span>))       <span class="cm"># one row per element</span>
+F.<span class="fn">array_contains</span>(<span class="fn">col</span>(<span class="st">"tags"</span>), <span class="st">"spark"</span>)
+F.<span class="fn">map_keys</span>(<span class="fn">col</span>(<span class="st">"metadata"</span>))
+F.<span class="fn">map_values</span>(<span class="fn">col</span>(<span class="st">"metadata"</span>))
+
+<span class="cm"># ── Conditional ───────────────────────────────────────────</span>
+F.<span class="fn">when</span>(<span class="fn">col</span>(<span class="st">"age"</span>) &lt; <span class="nu">30</span>, <span class="st">"Junior"</span>).<span class="fn">otherwise</span>(<span class="st">"Senior"</span>)
+F.<span class="fn">coalesce</span>(<span class="fn">col</span>(<span class="st">"a"</span>), <span class="fn">col</span>(<span class="st">"b"</span>), F.<span class="fn">lit</span>(<span class="st">"default"</span>))
+F.<span class="fn">isnull</span>(<span class="fn">col</span>(<span class="st">"salary"</span>))
+F.<span class="fn">isnan</span>(<span class="fn">col</span>(<span class="st">"score"</span>))</pre></div>
+</section>
+
+<section id="s-window">
+<h2>Window Functions</h2>
+<p>Window functions compute values across rows related to the current row without collapsing the DataFrame.</p>
+
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">window.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> Window
+<span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="cm"># ── Define window specs ────────────────────────────────────</span>
+win_dept = (<span class="cl">Window</span>.<span class="fn">partitionBy</span>(<span class="st">"department"</span>).<span class="fn">orderBy</span>(<span class="fn">col</span>(<span class="st">"salary"</span>).<span class="fn">desc</span>()))
+win_all  =  <span class="cl">Window</span>.<span class="fn">partitionBy</span>(<span class="st">"department"</span>)
+
+<span class="cm"># ── Ranking ────────────────────────────────────────────────</span>
+df.<span class="fn">withColumn</span>(<span class="st">"rank"</span>,       F.<span class="fn">rank</span>().<span class="fn">over</span>(win_dept))       <span class="cm"># gaps on ties: 1,1,3</span>
+df.<span class="fn">withColumn</span>(<span class="st">"dense_rank"</span>, F.<span class="fn">dense_rank</span>().<span class="fn">over</span>(win_dept)) <span class="cm"># no gaps: 1,1,2</span>
+df.<span class="fn">withColumn</span>(<span class="st">"row_num"</span>,    F.<span class="fn">row_number</span>().<span class="fn">over</span>(win_dept)) <span class="cm"># always unique</span>
+df.<span class="fn">withColumn</span>(<span class="st">"ntile"</span>,     F.<span class="fn">ntile</span>(<span class="nu">4</span>).<span class="fn">over</span>(win_dept))     <span class="cm"># quartiles</span>
+
+<span class="cm"># ── Aggregate over window ─────────────────────────────────</span>
+df.<span class="fn">withColumn</span>(<span class="st">"dept_avg"</span>,   F.<span class="fn">avg</span>(<span class="st">"salary"</span>).<span class="fn">over</span>(win_all))
+df.<span class="fn">withColumn</span>(<span class="st">"dept_total"</span>, F.<span class="fn">sum</span>(<span class="st">"salary"</span>).<span class="fn">over</span>(win_all))
+df.<span class="fn">withColumn</span>(<span class="st">"pct"</span>,        (<span class="fn">col</span>(<span class="st">"salary"</span>) / F.<span class="fn">sum</span>(<span class="st">"salary"</span>).<span class="fn">over</span>(win_all)))
+
+<span class="cm"># ── Running total ─────────────────────────────────────────</span>
+win_run = (<span class="cl">Window</span>.<span class="fn">partitionBy</span>(<span class="st">"department"</span>).<span class="fn">orderBy</span>(<span class="st">"hire_date"</span>)
+           .<span class="fn">rowsBetween</span>(<span class="cl">Window</span>.unboundedPreceding, <span class="cl">Window</span>.currentRow))
+df.<span class="fn">withColumn</span>(<span class="st">"cumulative"</span>, F.<span class="fn">sum</span>(<span class="st">"salary"</span>).<span class="fn">over</span>(win_run))
+
+<span class="cm"># ── Lag / Lead ────────────────────────────────────────────</span>
+win_t = <span class="cl">Window</span>.<span class="fn">partitionBy</span>(<span class="st">"user_id"</span>).<span class="fn">orderBy</span>(<span class="st">"event_ts"</span>)
+df.<span class="fn">withColumn</span>(<span class="st">"prev"</span>, F.<span class="fn">lag</span>(<span class="st">"event"</span>, <span class="nu">1</span>).<span class="fn">over</span>(win_t))
+df.<span class="fn">withColumn</span>(<span class="st">"next"</span>, F.<span class="fn">lead</span>(<span class="st">"event"</span>, <span class="nu">1</span>).<span class="fn">over</span>(win_t))
+
+<span class="cm"># ── Top-N per group ───────────────────────────────────────</span>
+top2 = (df.<span class="fn">withColumn</span>(<span class="st">"rn"</span>, F.<span class="fn">row_number</span>().<span class="fn">over</span>(win_dept))
+          .<span class="fn">filter</span>(<span class="fn">col</span>(<span class="st">"rn"</span>) &lt;= <span class="nu">2</span>).<span class="fn">drop</span>(<span class="st">"rn"</span>))</pre></div>
+</section>
+
+<section id="s-agg">
+<h2>Aggregation &amp; GroupBy</h2>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">aggregations.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="cm"># GroupBy + agg</span>
+df.<span class="fn">groupBy</span>(<span class="st">"department"</span>).<span class="fn">agg</span>(
+    F.<span class="fn">count</span>(<span class="st">"*"</span>).<span class="fn">alias</span>(<span class="st">"count"</span>),
+    F.<span class="fn">avg</span>(<span class="st">"salary"</span>).<span class="fn">alias</span>(<span class="st">"avg_salary"</span>),
+    F.<span class="fn">sum</span>(<span class="st">"salary"</span>).<span class="fn">alias</span>(<span class="st">"payroll"</span>),
+    F.<span class="fn">stddev</span>(<span class="st">"salary"</span>).<span class="fn">alias</span>(<span class="st">"std"</span>),
+    F.<span class="fn">percentile_approx</span>(<span class="st">"salary"</span>, <span class="nu">0.5</span>).<span class="fn">alias</span>(<span class="st">"median"</span>),
+    F.<span class="fn">collect_list</span>(<span class="st">"name"</span>).<span class="fn">alias</span>(<span class="st">"members"</span>),
+    F.<span class="fn">countDistinct</span>(<span class="st">"name"</span>).<span class="fn">alias</span>(<span class="st">"unique"</span>),
+)
+
+<span class="cm"># Pivot — dept values become columns</span>
+df.<span class="fn">groupBy</span>(<span class="st">"year"</span>).<span class="fn">pivot</span>(<span class="st">"department"</span>).<span class="fn">agg</span>(F.<span class="fn">avg</span>(<span class="st">"salary"</span>))
+
+<span class="cm"># Rollup — subtotals + grand total</span>
+df.<span class="fn">rollup</span>(<span class="st">"department"</span>, <span class="st">"seniority"</span>).<span class="fn">agg</span>(F.<span class="fn">sum</span>(<span class="st">"salary"</span>)).<span class="fn">show</span>()
+
+<span class="cm"># Cube — all combinations of subtotals</span>
+df.<span class="fn">cube</span>(<span class="st">"department"</span>, <span class="st">"seniority"</span>).<span class="fn">agg</span>(F.<span class="fn">sum</span>(<span class="st">"salary"</span>)).<span class="fn">show</span>()</pre></div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     CHAPTER 5 — DATA QUALITY
+════════════════════════════════════════════════ -->
+<div class="chapter"><span class="chapter-num">Chapter 5 · Data Quality</span><div class="chapter-line"></div></div>
+
+<section id="s-missing">
+<h2>Handling Missing Data</h2>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">missing_data.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="cm"># ── Detect nulls ──────────────────────────────────────────</span>
+df.<span class="fn">select</span>([F.<span class="fn">count</span>(F.<span class="fn">when</span>(F.<span class="fn">isnull</span>(<span class="fn">col</span>(c)), c)).<span class="fn">alias</span>(c)
+           <span class="kw">for</span> c <span class="kw">in</span> df.columns]).<span class="fn">show</span>()
+
+<span class="cm"># ── Drop rows with nulls ──────────────────────────────────</span>
+df.<span class="fn">dropna</span>(how=<span class="st">"any"</span>)                         <span class="cm"># drop if any column is null</span>
+df.<span class="fn">dropna</span>(how=<span class="st">"all"</span>)                         <span class="cm"># drop only if all are null</span>
+df.<span class="fn">dropna</span>(subset=[<span class="st">"salary"</span>, <span class="st">"department"</span>])   <span class="cm"># specific columns</span>
+df.<span class="fn">dropna</span>(thresh=<span class="nu">3</span>)                          <span class="cm"># keep rows with ≥3 non-nulls</span>
+
+<span class="cm"># ── Fill nulls ────────────────────────────────────────────</span>
+df.<span class="fn">fillna</span>(<span class="nu">0</span>)                                  <span class="cm"># all numeric columns</span>
+df.<span class="fn">fillna</span>(<span class="st">"Unknown"</span>)                          <span class="cm"># all string columns</span>
+df.<span class="fn">fillna</span>({<span class="st">"salary"</span>: <span class="nu">0.0</span>, <span class="st">"department"</span>: <span class="st">"N/A"</span>})
+
+<span class="cm"># ── Replace values ────────────────────────────────────────</span>
+df.<span class="fn">replace</span>(<span class="st">"HR"</span>, <span class="st">"Human Resources"</span>, subset=[<span class="st">"department"</span>])
+df.<span class="fn">replace</span>({<span class="nu">-1</span>: <span class="kw">None</span>, <span class="nu">-999</span>: <span class="kw">None</span>}, subset=[<span class="st">"salary"</span>])
+
+<span class="cm"># ── Impute with stats ─────────────────────────────────────</span>
+<span class="kw">from</span> pyspark.ml.feature <span class="kw">import</span> Imputer
+imputer = <span class="cl">Imputer</span>(inputCols=[<span class="st">"age"</span>,<span class="st">"salary"</span>],
+                   outputCols=[<span class="st">"age_imp"</span>,<span class="st">"salary_imp"</span>],
+                   strategy=<span class="st">"median"</span>)
+df = imputer.<span class="fn">fit</span>(df).<span class="fn">transform</span>(df)
+
+<span class="cm"># ── Filter nulls ──────────────────────────────────────────</span>
+df.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="st">"salary"</span>).<span class="fn">isNotNull</span>())
+df.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="st">"salary"</span>).<span class="fn">isNull</span>())</pre></div>
+</section>
+
+<section id="s-dates">
+<h2>Working with Dates &amp; Timestamps</h2>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">dates.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="cm"># ── Parse strings to dates ────────────────────────────────</span>
+df = df.<span class="fn">withColumn</span>(<span class="st">"date"</span>,  F.<span class="fn">to_date</span>(<span class="fn">col</span>(<span class="st">"date_str"</span>), <span class="st">"yyyy-MM-dd"</span>))
+df = df.<span class="fn">withColumn</span>(<span class="st">"ts"</span>,    F.<span class="fn">to_timestamp</span>(<span class="fn">col</span>(<span class="st">"ts_str"</span>), <span class="st">"yyyy-MM-dd HH:mm:ss"</span>))
+
+<span class="cm"># ── Current date / timestamp ─────────────────────────────</span>
+F.<span class="fn">current_date</span>()
+F.<span class="fn">current_timestamp</span>()
+
+<span class="cm"># ── Extract parts ─────────────────────────────────────────</span>
+F.<span class="fn">year</span>(<span class="fn">col</span>(<span class="st">"date"</span>))
+F.<span class="fn">month</span>(<span class="fn">col</span>(<span class="st">"date"</span>))
+F.<span class="fn">dayofmonth</span>(<span class="fn">col</span>(<span class="st">"date"</span>))
+F.<span class="fn">dayofweek</span>(<span class="fn">col</span>(<span class="st">"date"</span>))   <span class="cm"># 1=Sunday … 7=Saturday</span>
+F.<span class="fn">weekofyear</span>(<span class="fn">col</span>(<span class="st">"date"</span>))
+F.<span class="fn">quarter</span>(<span class="fn">col</span>(<span class="st">"date"</span>))
+F.<span class="fn">hour</span>(<span class="fn">col</span>(<span class="st">"ts"</span>))
+F.<span class="fn">minute</span>(<span class="fn">col</span>(<span class="st">"ts"</span>))
+
+<span class="cm"># ── Date arithmetic ───────────────────────────────────────</span>
+F.<span class="fn">date_add</span>(<span class="fn">col</span>(<span class="st">"date"</span>), <span class="nu">7</span>)          <span class="cm"># add 7 days</span>
+F.<span class="fn">date_sub</span>(<span class="fn">col</span>(<span class="st">"date"</span>), <span class="nu">30</span>)         <span class="cm"># subtract 30 days</span>
+F.<span class="fn">datediff</span>(<span class="fn">col</span>(<span class="st">"end"</span>), <span class="fn">col</span>(<span class="st">"start"</span>)) <span class="cm"># days between</span>
+F.<span class="fn">months_between</span>(<span class="fn">col</span>(<span class="st">"end"</span>), <span class="fn">col</span>(<span class="st">"start"</span>))
+F.<span class="fn">add_months</span>(<span class="fn">col</span>(<span class="st">"date"</span>), <span class="nu">3</span>)
+
+<span class="cm"># ── Format / convert ──────────────────────────────────────</span>
+F.<span class="fn">date_format</span>(<span class="fn">col</span>(<span class="st">"date"</span>), <span class="st">"dd/MM/yyyy"</span>)
+F.<span class="fn">unix_timestamp</span>(<span class="fn">col</span>(<span class="st">"ts"</span>))               <span class="cm"># → epoch seconds</span>
+F.<span class="fn">from_unixtime</span>(<span class="fn">col</span>(<span class="st">"epoch"</span>))             <span class="cm"># → timestamp string</span>
+F.<span class="fn">trunc</span>(<span class="fn">col</span>(<span class="st">"date"</span>), <span class="st">"month"</span>)            <span class="cm"># truncate to month start</span>
+F.<span class="fn">trunc</span>(<span class="fn">col</span>(<span class="st">"date"</span>), <span class="st">"year"</span>)</pre></div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     CHAPTER 6 — I/O FORMATS
+════════════════════════════════════════════════ -->
+<div class="chapter"><span class="chapter-num">Chapter 6 · I/O Formats</span><div class="chapter-line"></div></div>
+
+<section id="s-io">
+<h2>JSON / CSV / Parquet</h2>
+
+<h3>Reading</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">read_formats.py</span></div>
+<pre><span class="cm"># CSV</span>
+df = (spark.read
+      .<span class="fn">option</span>(<span class="st">"header"</span>, <span class="st">"true"</span>)
+      .<span class="fn">option</span>(<span class="st">"inferSchema"</span>, <span class="st">"true"</span>)
+      .<span class="fn">option</span>(<span class="st">"nullValue"</span>, <span class="st">"NA"</span>)
+      .<span class="fn">csv</span>(<span class="st">"data/*.csv"</span>))
+
+<span class="cm"># JSON (line-delimited)</span>
+df = spark.read.<span class="fn">json</span>(<span class="st">"data/events/*.jsonl"</span>)
+
+<span class="cm"># JSON (multi-line document)</span>
+df = spark.read.<span class="fn">option</span>(<span class="st">"multiLine"</span>, <span class="st">"true"</span>).<span class="fn">json</span>(<span class="st">"data/config.json"</span>)
+
+<span class="cm"># Parse JSON stored in a column string</span>
+df = df.<span class="fn">withColumn</span>(<span class="st">"parsed"</span>, F.<span class="fn">from_json</span>(<span class="fn">col</span>(<span class="st">"payload"</span>), schema))
+
+<span class="cm"># Parquet — schema embedded, columnar, compressed</span>
+df = spark.read.<span class="fn">parquet</span>(<span class="st">"data/users/"</span>)
+
+<span class="cm"># ORC</span>
+df = spark.read.<span class="fn">orc</span>(<span class="st">"data/hive/table/"</span>)
+
+<span class="cm"># JDBC / relational DB</span>
+df = spark.read.<span class="fn">jdbc</span>(
+    url=<span class="st">"jdbc:postgresql://host:5432/db"</span>,
+    table=<span class="st">"orders"</span>,
+    column=<span class="st">"order_id"</span>, lowerBound=<span class="nu">1</span>, upperBound=<span class="nu">10_000_000</span>,
+    numPartitions=<span class="nu">16</span>,
+    properties={<span class="st">"user"</span>:<span class="st">"u"</span>,<span class="st">"password"</span>:<span class="st">"p"</span>,<span class="st">"driver"</span>:<span class="st">"org.postgresql.Driver"</span>}
+)</pre></div>
+
+<h3>Writing</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">write_formats.py</span></div>
+<pre><span class="cm"># Parquet with partitioning</span>
+(df.write.<span class="fn">mode</span>(<span class="st">"overwrite"</span>)
+   .<span class="fn">partitionBy</span>(<span class="st">"year"</span>, <span class="st">"month"</span>)
+   .<span class="fn">parquet</span>(<span class="st">"s3a://bucket/output/events"</span>))
+
+<span class="cm"># Single CSV file</span>
+df.<span class="fn">coalesce</span>(<span class="nu">1</span>).write.<span class="fn">mode</span>(<span class="st">"overwrite"</span>).<span class="fn">csv</span>(<span class="st">"output/report"</span>, header=<span class="kw">True</span>)
+
+<span class="cm"># JSON</span>
+df.write.<span class="fn">mode</span>(<span class="st">"append"</span>).<span class="fn">json</span>(<span class="st">"output/json/"</span>)
+
+<span class="cm"># Write modes: "overwrite", "append", "ignore", "error" (default)</span></pre></div>
+
+<div class="tw"><table>
+  <tr><th>Format</th><th>Pros</th><th>Cons</th><th>Best For</th></tr>
+  <tr><td>CSV</td><td>Human-readable, universal</td><td>No schema, slow, large</td><td>Data exchange, reporting</td></tr>
+  <tr><td>JSON</td><td>Nested structures, flexible</td><td>Verbose, slow</td><td>APIs, semi-structured logs</td></tr>
+  <tr><td>Parquet</td><td>Columnar, compressed, fast</td><td>Not human-readable</td><td>Analytics, data lakes</td></tr>
+  <tr><td>ORC</td><td>Columnar, Hive-optimized</td><td>Hadoop ecosystem only</td><td>Hive workloads</td></tr>
+  <tr><td>Delta</td><td>ACID, time travel, MERGE</td><td>Requires Delta runtime</td><td>Production data lakes</td></tr>
+</table></div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     CHAPTER 7 — ADVANCED
+════════════════════════════════════════════════ -->
+<div class="chapter"><span class="chapter-num">Chapter 7 · Advanced Topics</span><div class="chapter-line"></div></div>
+
+<section id="s-perf">
+<h2>Performance Optimization</h2>
+
+<h3>Adaptive Query Execution (AQE)</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">aqe.py</span></div>
+<pre>spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="st">"spark.sql.adaptive.enabled"</span>,                         <span class="st">"true"</span>)
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="st">"spark.sql.adaptive.coalescePartitions.enabled"</span>,       <span class="st">"true"</span>)
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="st">"spark.sql.adaptive.advisoryPartitionSizeInBytes"</span>,    <span class="st">"128m"</span>)
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="st">"spark.sql.adaptive.skewJoin.enabled"</span>,               <span class="st">"true"</span>)</pre></div>
+
+<h3>Key Optimizations</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">perf.py</span></div>
+<pre><span class="cm"># 1. Broadcast small dimension tables</span>
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast
+result = large_df.<span class="fn">join</span>(<span class="fn">broadcast</span>(small_df), <span class="st">"id"</span>)
+
+<span class="cm"># 2. Select early — column pruning</span>
+df = spark.read.<span class="fn">parquet</span>(<span class="st">"data/"</span>).<span class="fn">select</span>(<span class="st">"id"</span>, <span class="st">"amount"</span>)  <span class="cm"># reads only 2 cols</span>
+
+<span class="cm"># 3. Filter early — predicate pushdown</span>
+df = spark.read.<span class="fn">parquet</span>(<span class="st">"data/"</span>).<span class="fn">filter</span>(<span class="fn">col</span>(<span class="st">"year"</span>) == <span class="nu">2024</span>)
+
+<span class="cm"># 4. Avoid Python UDFs — use native functions</span>
+<span class="cm"># Bad:  udf(lambda s: s.upper())</span>
+<span class="cm"># Good: F.upper(col("name"))</span>
+
+<span class="cm"># 5. Cache reused DataFrames</span>
+base = df.<span class="fn">filter</span>(<span class="fn">col</span>(<span class="st">"active"</span>)).<span class="fn">cache</span>()
+base.<span class="fn">count</span>()                         <span class="cm"># materialize</span>
+summary = base.<span class="fn">groupBy</span>(<span class="st">"dept"</span>).<span class="fn">agg</span>(F.<span class="fn">avg</span>(<span class="st">"salary"</span>))
+detail  = base.<span class="fn">join</span>(other, <span class="st">"id"</span>)
+base.<span class="fn">unpersist</span>()                      <span class="cm"># free memory</span>
+
+<span class="cm"># 6. Kryo serializer (faster than Java default)</span>
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="st">"spark.serializer"</span>, <span class="st">"org.apache.spark.serializer.KryoSerializer"</span>)
+
+<span class="cm"># 7. Handle data skew with salting</span>
+N = <span class="nu">10</span>
+salted = df.<span class="fn">withColumn</span>(<span class="st">"salt"</span>, (F.<span class="fn">rand</span>() * N).<span class="fn">cast</span>(<span class="st">"int"</span>))
+salted = salted.<span class="fn">withColumn</span>(<span class="st">"key_s"</span>, F.<span class="fn">concat</span>(<span class="fn">col</span>(<span class="st">"key"</span>), F.<span class="fn">lit</span>(<span class="st">"_"</span>), <span class="fn">col</span>(<span class="st">"salt"</span>)))
+
+<span class="cm"># 8. Explain the query plan</span>
+df.<span class="fn">explain</span>(mode=<span class="st">"extended"</span>)   <span class="cm"># parsed → analyzed → optimized → physical</span></pre></div>
+
+<div class="tw"><table>
+  <tr><th>Config</th><th>Default</th><th>Recommendation</th></tr>
+  <tr><td><code>spark.sql.shuffle.partitions</code></td><td>200</td><td>2–3× executor cores; AQE auto-tunes</td></tr>
+  <tr><td><code>spark.executor.memory</code></td><td>1g</td><td>4–8g for most workloads</td></tr>
+  <tr><td><code>spark.executor.cores</code></td><td>1</td><td>4–5 CPU-bound; 2 memory-bound</td></tr>
+  <tr><td><code>spark.sql.autoBroadcastJoinThreshold</code></td><td>10MB</td><td>Raise to 50–100MB if memory allows</td></tr>
+  <tr><td><code>spark.memory.fraction</code></td><td>0.6</td><td>Raise to 0.7 if spilling to disk</td></tr>
+</table></div>
+</section>
+
+<section id="s-aws">
+<h2>PySpark with AWS</h2>
+
+<h3>Reading / Writing S3</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">aws_s3.py</span></div>
+<pre><span class="cm"># Configure S3 access (set via spark-submit or SparkSession)</span>
+spark._jsc.hadoopConfiguration().<span class="fn">set</span>(<span class="st">"fs.s3a.access.key"</span>, <span class="st">"..."</span>)
+spark._jsc.hadoopConfiguration().<span class="fn">set</span>(<span class="st">"fs.s3a.secret.key"</span>, <span class="st">"..."</span>)
+spark._jsc.hadoopConfiguration().<span class="fn">set</span>(<span class="st">"fs.s3a.endpoint"</span>,   <span class="st">"s3.amazonaws.com"</span>)
+
+<span class="cm"># Use IAM roles (preferred — no hardcoded keys)</span>
+spark._jsc.hadoopConfiguration().<span class="fn">set</span>(
+    <span class="st">"fs.s3a.aws.credentials.provider"</span>,
+    <span class="st">"com.amazonaws.auth.InstanceProfileCredentialsProvider"</span>)
+
+<span class="cm"># Read / Write</span>
+df = spark.read.<span class="fn">parquet</span>(<span class="st">"s3a://my-bucket/data/users/"</span>)
+df.write.<span class="fn">mode</span>(<span class="st">"overwrite"</span>).<span class="fn">parquet</span>(<span class="st">"s3a://my-bucket/output/users/"</span>)</pre></div>
+
+<h3>AWS Glue Catalog</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">glue_catalog.py</span></div>
+<pre><span class="cm"># Use Glue as Hive metastore</span>
+spark = (
+    <span class="cl">SparkSession</span>.<span class="fn">builder</span>
+    .<span class="fn">config</span>(<span class="st">"hive.metastore.client.factory.class"</span>,
+            <span class="st">"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"</span>)
+    .<span class="fn">enableHiveSupport</span>()
+    .<span class="fn">getOrCreate</span>()
+)
+
+<span class="cm"># Query Glue tables directly</span>
+spark.<span class="fn">sql</span>(<span class="st">"SELECT * FROM my_glue_database.my_table LIMIT 10"</span>).<span class="fn">show</span>()</pre></div>
+
+<h3>EMR Cluster Submission</h3>
+<div class="cb"><div class="cb-head"><span class="lang">bash</span><span class="file">terminal</span></div>
+<pre><span class="cm"># Submit to EMR</span>
+spark-submit \
+  --master yarn \
+  --deploy-mode cluster \
+  --conf spark.executor.memory=8g \
+  --conf spark.executor.cores=4 \
+  --conf spark.sql.adaptive.enabled=true \
+  s3a://my-bucket/scripts/etl_job.py \
+  --input  s3a://my-bucket/raw/ \
+  --output s3a://my-bucket/processed/</pre></div>
+
+<h3>Key AWS + Spark Packages</h3>
+<div class="tw"><table>
+  <tr><th>Package</th><th>Purpose</th></tr>
+  <tr><td><code>hadoop-aws</code></td><td>S3A connector for reading/writing S3</td></tr>
+  <tr><td><code>aws-java-sdk-bundle</code></td><td>AWS SDK for auth and services</td></tr>
+  <tr><td>AWS Glue</td><td>Serverless ETL + Glue Data Catalog (Hive metastore)</td></tr>
+  <tr><td>AWS EMR</td><td>Managed Spark/Hadoop cluster</td></tr>
+  <tr><td>Amazon Redshift</td><td>JDBC target for Spark ETL outputs</td></tr>
+  <tr><td>AWS Lake Formation</td><td>Governance layer over S3 data lake</td></tr>
+</table></div>
+</section>
+
+<section id="s-delta">
+<h2>Delta Lake</h2>
+<p>Delta Lake adds <strong>ACID transactions</strong>, schema enforcement, and time travel to data lakes built on cloud storage.</p>
+
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">delta_lake.py</span></div>
+<pre><span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable
+
+<span class="cm"># ── Write ──────────────────────────────────────────────────</span>
+df.write.<span class="fn">format</span>(<span class="st">"delta"</span>).<span class="fn">mode</span>(<span class="st">"overwrite"</span>).<span class="fn">save</span>(<span class="st">"s3a://bucket/tables/users"</span>)
+
+<span class="cm"># ── Read ───────────────────────────────────────────────────</span>
+df = spark.read.<span class="fn">format</span>(<span class="st">"delta"</span>).<span class="fn">load</span>(<span class="st">"s3a://bucket/tables/users"</span>)
+
+<span class="cm"># ── Time Travel ────────────────────────────────────────────</span>
+df_v3 = (spark.read.<span class="fn">format</span>(<span class="st">"delta"</span>)
+         .<span class="fn">option</span>(<span class="st">"versionAsOf"</span>, <span class="nu">3</span>)
+         .<span class="fn">load</span>(<span class="st">"s3a://bucket/tables/users"</span>))
+
+df_ts = (spark.read.<span class="fn">format</span>(<span class="st">"delta"</span>)
+         .<span class="fn">option</span>(<span class="st">"timestampAsOf"</span>, <span class="st">"2025-01-01"</span>)
+         .<span class="fn">load</span>(<span class="st">"s3a://bucket/tables/users"</span>))
+
+<span class="cm"># ── MERGE (Upsert) ─────────────────────────────────────────</span>
+delta_tbl = <span class="cl">DeltaTable</span>.<span class="fn">forPath</span>(spark, <span class="st">"s3a://bucket/tables/users"</span>)
+(delta_tbl.<span class="fn">alias</span>(<span class="st">"tgt"</span>)
+ .<span class="fn">merge</span>(new_df.<span class="fn">alias</span>(<span class="st">"src"</span>), <span class="st">"tgt.user_id = src.user_id"</span>)
+ .<span class="fn">whenMatchedUpdateAll</span>()
+ .<span class="fn">whenNotMatchedInsertAll</span>()
+ .<span class="fn">execute</span>())
+
+<span class="cm"># ── DELETE ─────────────────────────────────────────────────</span>
+delta_tbl.<span class="fn">delete</span>(<span class="fn">col</span>(<span class="st">"active"</span>) == <span class="kw">False</span>)
+
+<span class="cm"># ── UPDATE ─────────────────────────────────────────────────</span>
+delta_tbl.<span class="fn">update</span>(
+    condition=<span class="fn">col</span>(<span class="st">"dept"</span>) == <span class="st">"HR"</span>,
+    set={<span class="st">"dept"</span>: F.<span class="fn">lit</span>(<span class="st">"Human Resources"</span>)}
+)
+
+<span class="cm"># ── History &amp; Vacuum ───────────────────────────────────────</span>
+delta_tbl.<span class="fn">history</span>().<span class="fn">show</span>()
+delta_tbl.<span class="fn">vacuum</span>(retentionHours=<span class="nu">168</span>)   <span class="cm"># remove old files (7-day default)</span></pre></div>
+</section>
+
+<section id="s-stream">
+<h2>PySpark Structured Streaming</h2>
+<p>Structured Streaming treats a live stream as an <strong>unbounded table</strong>. New data arrives as appended rows.</p>
+
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">streaming.py</span></div>
+<pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+<span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> StructType, StructField, StringType, LongType
+
+<span class="cm"># ── Read from Kafka ────────────────────────────────────────</span>
+raw = (spark.readStream
+       .<span class="fn">format</span>(<span class="st">"kafka"</span>)
+       .<span class="fn">option</span>(<span class="st">"kafka.bootstrap.servers"</span>, <span class="st">"broker:9092"</span>)
+       .<span class="fn">option</span>(<span class="st">"subscribe"</span>, <span class="st">"events"</span>)
+       .<span class="fn">option</span>(<span class="st">"startingOffsets"</span>, <span class="st">"latest"</span>)
+       .<span class="fn">load</span>())
+
+event_schema = <span class="cl">StructType</span>([
+    <span class="cl">StructField</span>(<span class="st">"user_id"</span>,    <span class="cl">LongType</span>()),
+    <span class="cl">StructField</span>(<span class="st">"event_type"</span>, <span class="cl">StringType</span>()),
+    <span class="cl">StructField</span>(<span class="st">"ts"</span>,         <span class="cl">LongType</span>()),
+])
+parsed = (raw
+    .<span class="fn">select</span>(F.<span class="fn">from_json</span>(<span class="fn">col</span>(<span class="st">"value"</span>).<span class="fn">cast</span>(<span class="st">"string"</span>), event_schema).<span class="fn">alias</span>(<span class="st">"d"</span>))
+    .<span class="fn">select</span>(<span class="st">"d.*"</span>)
+    .<span class="fn">withColumn</span>(<span class="st">"event_time"</span>, (F.<span class="fn">col</span>(<span class="st">"ts"</span>) / <span class="nu">1000</span>).<span class="fn">cast</span>(<span class="st">"timestamp"</span>)))
+
+<span class="cm"># ── Windowed aggregation with watermark ───────────────────</span>
+windowed = (parsed
+    .<span class="fn">withWatermark</span>(<span class="st">"event_time"</span>, <span class="st">"10 minutes"</span>)
+    .<span class="fn">groupBy</span>(F.<span class="fn">window</span>(<span class="st">"event_time"</span>, <span class="st">"5 minutes"</span>, <span class="st">"1 minute"</span>), <span class="st">"event_type"</span>)
+    .<span class="fn">agg</span>(F.<span class="fn">count</span>(<span class="st">"*"</span>).<span class="fn">alias</span>(<span class="st">"event_count"</span>)))
+
+<span class="cm"># ── Sink to Delta ─────────────────────────────────────────</span>
+query = (windowed.writeStream
+    .<span class="fn">format</span>(<span class="st">"delta"</span>)
+    .<span class="fn">outputMode</span>(<span class="st">"append"</span>)
+    .<span class="fn">option</span>(<span class="st">"checkpointLocation"</span>, <span class="st">"s3a://bucket/checkpoints/events"</span>)
+    .<span class="fn">trigger</span>(processingTime=<span class="st">"30 seconds"</span>)
+    .<span class="fn">start</span>(<span class="st">"s3a://bucket/tables/event_counts"</span>))
+
+query.<span class="fn">awaitTermination</span>()
+
+<span class="cm"># ── foreachBatch — arbitrary logic per micro-batch ────────</span>
+<span class="kw">def</span> <span class="fn">process_batch</span>(batch_df, batch_id):
+    batch_df.write.<span class="fn">mode</span>(<span class="st">"append"</span>).<span class="fn">parquet</span>(<span class="st">f"output/batch_{batch_id}"</span>)
+
+(parsed.writeStream.<span class="fn">foreachBatch</span>(process_batch)
+       .<span class="fn">option</span>(<span class="st">"checkpointLocation"</span>, <span class="st">"/tmp/ckpt"</span>).<span class="fn">start</span>())</pre></div>
+
+<div class="tw"><table>
+  <tr><th>Output Mode</th><th>When to Use</th></tr>
+  <tr><td><code>append</code></td><td>New rows only — no updates to previous output. Default.</td></tr>
+  <tr><td><code>complete</code></td><td>Full result table every trigger. For aggregations without watermark.</td></tr>
+  <tr><td><code>update</code></td><td>Only changed rows since last trigger.</td></tr>
+</table></div>
+</section>
+
+<section id="s-mllib">
+<h2>PySpark MLlib</h2>
+
+<h3>Full ML Pipeline</h3>
+<div class="cb"><div class="cb-head"><span class="lang">python</span><span class="file">mllib.py</span></div>
+<pre><span class="kw">from</span> pyspark.ml <span class="kw">import</span> Pipeline
+<span class="kw">from</span> pyspark.ml.feature <span class="kw">import</span> (
+    StringIndexer, OneHotEncoder, VectorAssembler, StandardScaler, Imputer
+)
+<span class="kw">from</span> pyspark.ml.classification <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> pyspark.ml.regression <span class="kw">import</span> GBTRegressor
+<span class="kw">from</span> pyspark.ml.evaluation <span class="kw">import</span> (
+    BinaryClassificationEvaluator, RegressionEvaluator
+)
+<span class="kw">from</span> pyspark.ml.tuning <span class="kw">import</span> CrossValidator, ParamGridBuilder
+
+<span class="cm"># Stage 1 — Impute missing numerics</span>
+imputer = <span class="cl">Imputer</span>(inputCols=[<span class="st">"age"</span>,<span class="st">"salary"</span>],
+                   outputCols=[<span class="st">"age_i"</span>,<span class="st">"salary_i"</span>], strategy=<span class="st">"median"</span>)
+
+<span class="cm"># Stage 2 — Encode categorical</span>
+idx = <span class="cl">StringIndexer</span>(inputCol=<span class="st">"department"</span>, outputCol=<span class="st">"dept_idx"</span>)
+ohe = <span class="cl">OneHotEncoder</span>(inputCol=<span class="st">"dept_idx"</span>,   outputCol=<span class="st">"dept_vec"</span>)
+
+<span class="cm"># Stage 3 — Assemble feature vector</span>
+asm = <span class="cl">VectorAssembler</span>(inputCols=[<span class="st">"dept_vec"</span>,<span class="st">"age_i"</span>,<span class="st">"salary_i"</span>],
+                        outputCol=<span class="st">"features_raw"</span>)
+
+<span class="cm"># Stage 4 — Scale</span>
+scl = <span class="cl">StandardScaler</span>(inputCol=<span class="st">"features_raw"</span>, outputCol=<span class="st">"features"</span>)
+
+<span class="cm"># Stage 5 — Model</span>
+rf = <span class="cl">RandomForestClassifier</span>(labelCol=<span class="st">"promoted"</span>, numTrees=<span class="nu">100</span>, maxDepth=<span class="nu">5</span>)
+
+<span class="cm"># Build &amp; train</span>
+pipeline = <span class="cl">Pipeline</span>(stages=[imputer, idx, ohe, asm, scl, rf])
+train, test = df.<span class="fn">randomSplit</span>([<span class="nu">0.8</span>, <span class="nu">0.2</span>], seed=<span class="nu">42</span>)
+
+<span class="cm"># Cross-validation</span>
+grid = <span class="cl">ParamGridBuilder</span>().<span class="fn">addGrid</span>(rf.numTrees,[<span class="nu">50</span>,<span class="nu">100</span>]).<span class="fn">addGrid</span>(rf.maxDepth,[<span class="nu">3</span>,<span class="nu">5</span>]).<span class="fn">build</span>()
+cv   = <span class="cl">CrossValidator</span>(estimator=pipeline, estimatorParamMaps=grid,
+                        evaluator=<span class="cl">BinaryClassificationEvaluator</span>(labelCol=<span class="st">"promoted"</span>),
+                        numFolds=<span class="nu">3</span>)
+model = cv.<span class="fn">fit</span>(train)
+preds = model.<span class="fn">transform</span>(test)
+
+<span class="cm"># Save / load</span>
+model.<span class="fn">bestModel</span>.<span class="fn">save</span>(<span class="st">"s3a://bucket/models/rf_v1"</span>)
+
+<span class="kw">from</span> pyspark.ml <span class="kw">import</span> PipelineModel
+loaded = <span class="cl">PipelineModel</span>.<span class="fn">load</span>(<span class="st">"s3a://bucket/models/rf_v1"</span>)</pre></div>
+
+<h3>Common Algorithms</h3>
+<div class="tw"><table>
+  <tr><th>Task</th><th>Algorithm</th><th>Class</th></tr>
+  <tr><td>Classification</td><td>Logistic Regression</td><td><code>LogisticRegression</code></td></tr>
+  <tr><td>Classification</td><td>Random Forest</td><td><code>RandomForestClassifier</code></td></tr>
+  <tr><td>Classification</td><td>Gradient Boosted Trees</td><td><code>GBTClassifier</code></td></tr>
+  <tr><td>Regression</td><td>Linear Regression</td><td><code>LinearRegression</code></td></tr>
+  <tr><td>Regression</td><td>GBT Regressor</td><td><code>GBTRegressor</code></td></tr>
+  <tr><td>Clustering</td><td>K-Means</td><td><code>KMeans</code></td></tr>
+  <tr><td>Recommendation</td><td>ALS (Collaborative Filtering)</td><td><code>ALS</code></td></tr>
+  <tr><td>Dimensionality Reduction</td><td>PCA</td><td><code>PCA</code></td></tr>
+  <tr><td>NLP</td><td>TF-IDF</td><td><code>HashingTF</code> + <code>IDF</code></td></tr>
+</table></div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     CHAPTER 8 — INTERVIEW QUESTIONS
+════════════════════════════════════════════════ -->
+<div class="chapter"><span class="chapter-num">Chapter 8 · Interview Questions</span><div class="chapter-line"></div></div>
+
+<section id="s-interview">
+<h2>PySpark Interview Questions</h2>
+
+<h3>Fundamentals</h3>
+<div class="note note-info"><strong>Q: What is the difference between a transformation and an action?</strong>
+Transformations (<code>filter</code>, <code>select</code>, <code>map</code>) are lazy — they build a logical plan (DAG) but don't execute. Actions (<code>count</code>, <code>show</code>, <code>collect</code>, <code>write</code>) trigger execution of the full plan.</div>
+
+<div class="note note-info"><strong>Q: What is a DAG in Spark?</strong>
+A Directed Acyclic Graph — the logical execution plan Spark builds from your transformations. Spark's Catalyst Optimizer rewrites it before physical execution, applying rule-based and cost-based optimizations.</div>
+
+<div class="note note-info"><strong>Q: What is the difference between repartition() and coalesce()?</strong>
+<code>repartition(n)</code> performs a full shuffle and can increase or decrease partitions.
+<code>coalesce(n)</code> only decreases partitions and avoids a full shuffle — use it when reducing partition count.</div>
+
+<div class="note note-info"><strong>Q: What is the difference between cache() and persist()?</strong>
+<code>cache()</code> is equivalent to <code>persist(StorageLevel.MEMORY_AND_DISK)</code>. <code>persist()</code> lets you choose the storage level: MEMORY_ONLY, MEMORY_AND_DISK, DISK_ONLY, etc.</div>
+
+<div class="note note-info"><strong>Q: What causes a shuffle and why is it expensive?</strong>
+A shuffle occurs when data must be redistributed across partitions — triggered by <code>groupBy</code>, <code>join</code>, <code>orderBy</code>, <code>distinct</code>. It involves disk I/O, network transfer, and serialization — the most expensive Spark operation.</div>
+
+<h3>Performance</h3>
+<div class="note note-warn"><strong>Q: How do you handle data skew?</strong>
+Salting: add a random salt column (0–N) to the skewed key, explode the small side with all salt values, then join on the salted key. AQE's skewJoin optimization can also handle this automatically in Spark 3.x.</div>
+
+<div class="note note-warn"><strong>Q: When should you use broadcast join?</strong>
+When one side of the join is small enough to fit in executor memory (typically &lt;100MB). Spark replicates it to all executors, eliminating the shuffle. Set <code>spark.sql.autoBroadcastJoinThreshold</code> or use <code>broadcast()</code> hint.</div>
+
+<div class="note note-warn"><strong>Q: What is predicate pushdown?</strong>
+Spark pushes filter conditions down to the data source (e.g., Parquet reader, JDBC query) so that only matching rows are read — reducing I/O significantly.</div>
+
+<h3>Architecture</h3>
+<div class="note note-tip"><strong>Q: What is the role of the Catalyst Optimizer?</strong>
+Catalyst is Spark's query optimization engine. It applies rule-based transformations (predicate pushdown, column pruning, constant folding) and cost-based optimizations to produce an efficient physical execution plan.</div>
+
+<div class="note note-tip"><strong>Q: What is Tungsten?</strong>
+Tungsten is Spark's execution engine that uses off-heap memory management, cache-aware algorithms, and whole-stage code generation (compiling query plans to JVM bytecode) for near-native CPU performance.</div>
+
+<div class="note note-tip"><strong>Q: What is the difference between narrow and wide transformations?</strong>
+<strong>Narrow:</strong> each input partition maps to exactly one output partition — no shuffle (<code>map</code>, <code>filter</code>, <code>select</code>). <strong>Wide:</strong> input partitions may contribute to multiple output partitions — requires a shuffle (<code>groupBy</code>, <code>join</code>, <code>repartition</code>).</div>
+
+<h3>Streaming</h3>
+<div class="note note-tip"><strong>Q: What is a watermark in Structured Streaming?</strong>
+A watermark tells Spark how long to wait for late-arriving data. E.g., <code>withWatermark("event_time", "10 minutes")</code> means Spark will wait 10 minutes beyond the max seen event time before closing a window.</div>
+
+<div class="note note-tip"><strong>Q: What is exactly-once processing in Structured Streaming?</strong>
+Spark Structured Streaming guarantees exactly-once semantics when using supported sources (Kafka, files) and sinks (Delta Lake, Kafka) with checkpointing enabled. The checkpoint tracks offsets and committed state.</div>
+</section>
+
+</main>
+</div>
+
+<script>
+  const links    = document.querySelectorAll("nav a[href^='#']");
+  const sections = document.querySelectorAll("section[id]");
+  const prog     = document.getElementById("prog");
+
+  window.addEventListener("scroll", () => {
+    const y    = window.scrollY;
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.width = Math.min((y / docH) * 100, 100) + "%";
+
+    let cur = "";
+    sections.forEach(s => { if (y >= s.offsetTop - 90) cur = s.id; });
+    links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + cur));
+  }, { passive: true });
+</script>
+</body>
+</html>
